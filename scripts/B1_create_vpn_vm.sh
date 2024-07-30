@@ -30,7 +30,7 @@ get_vnc_port()
   VNC_PORT=$(expr ${VNC_PORT} + 1)
 }
 
-# create_vm
+# for_create_vm
 # $1 - NODE_NAME: node name
 # $2 - ARCH: x86_64 or aarch64
 # $3 - MEMORY(MB): memory
@@ -40,8 +40,9 @@ get_vnc_port()
 # $7 - QEMU_APP: qemu app name
 # $8 - VNC: vnc port
 # $9 - VM_UUID: vm UUID
-create_vm()
+for_create_vm()
 {
+
   TPL_DIR=${DIR}/tpl
   TPL_BAK_DIR=${TPL_DIR}/bak
   \cp ${TPL_DIR}/create_vm.tpl ${TPL_BAK_DIR}/
@@ -81,16 +82,53 @@ create_vm_xml()
   searchandreplace %VM_UUID%      $9 $TPL_BAK_DIR
 }
 
-ROOT_FS="${DIR}/rootfs/rootfs_debian_amd64.qcow2" 
-IMAGE="${DIR}/boot_image/bzImage_amd64_virtio"
+# create_vm
+# $1 - NODE_NAME: node name
+# $2 - MEMORY(MB): memory
+# $3 - VCPU: cpu count
+# $4 - ip1 address: 
+# $5 - gw1 address: 
+# $6 - bridge1: 
+create_vm()
+{
+  IMAGE="${DIR}/boot_image/bzImage_amd64_virtio"
+  IMAGE=${IMAGE//\//\\\/}
 
-ROOT_FS=${ROOT_FS//\//\\\/}
-IMAGE=${IMAGE//\//\\\/}
+  ROOT_FS="${DIR}/rootfs/rootfs_debian_amd64.${IMG_EXT}" 
+  ROOT_FS=${ROOT_FS//\//\\\/}
+  
+  get_vm_uuid
+  get_mac_address
+  get_vnc_port
 
-get_vm_uuid
-get_mac_address
-get_vnc_port
+  for_create_vm $1 "x86_64" $2 $3 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT $VM_UUID
+}
 
-create_vm "node_1" "x86_64" 200 2 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT $VM_UUID
+# create_vpn
+# $1 - NODE_NAME: node name
+# $2 - MEMORY(MB): memory
+# $3 - VCPU: cpu count
+# $4 - ip1 address: 
+# $5 - gw1 address: 
+# $6 - bridge1: 
+# $7 - ip2 address: 
+# $8 - gw2 address: 
+# $9 - bridge2: 
+create_vpn()
+{
+  IMAGE="${DIR}/boot_image/bzImage_amd64_virtio"
+  IMAGE=${IMAGE//\//\\\/}
+
+  ROOT_FS="${DIR}/rootfs/rootfs_debian_amd64.${IMG_EXT}" 
+  ROOT_FS=${ROOT_FS//\//\\\/}
+  
+  get_vm_uuid
+  get_mac_address
+  get_vnc_port
+
+  for_create_vm $1 "x86_64" $2 $3 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT $VM_UUID
+}
+
+create_vm "node_1" 200 2
 
 echo "create vpn and vm end."

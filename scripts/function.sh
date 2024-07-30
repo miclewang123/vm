@@ -14,22 +14,23 @@
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
 
-export DIR_SCRIPTS="$(dirname `readlink -f $0`)"
+DIR_SCRIPTS="$(dirname `readlink -f $0`)"
 export DIR="$(dirname ${DIR_SCRIPTS})"
 export TERM=xterm
 export MAC_ID=0
 export VNC_PORT=5901
 export VM_UUID="1f35c25d-6a7b-4ee1-2461-d7e50000"
+export IMG_EXT="qcow2"
 
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 NORMAL=$(tput op)
 
-if [ -z "$LOGFILE" ]; then
+if [ -z "$LOG_FILE" ]; then
   #TEST_DATE="$(date +%Y%m%d%H%M%S)"
   TEST_DATE=""
-  export LOGFILE=${DIR}/log/test${TEST_DATE}.log
+  export LOG_FILE=${DIR}/log/test${TEST_DATE}.log
 fi
 
 # exit with given error message
@@ -53,14 +54,14 @@ execute()
 {
 	cmd=${1}
   echo command: $cmd 2>&1
-	echo $cmd >>$LOGFILE 2>&1
-	$cmd >>$LOGFILE 2>&1
+	echo $cmd >>$LOG_FILE 2>&1
+	$cmd >>$LOG_FILE 2>&1
 	status=$?
 	[ "$2" != 0 ] && log_status $status
 	if [ $status != 0 ]; then
 		echo
 		echo "! Command $cmd failed, exiting (status $status)"
-		echo "! Check why here $LOGFILE"
+		echo "! Check why here $LOG_FILE"
 		exit 1
 	fi
 }
@@ -69,7 +70,7 @@ execute()
 # $1 - command to execute
 execute_chroot()
 {
-	execute "chroot $LOOPDIR env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin $@"
+	execute "chroot $LOOP_DIR env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin $@"
 }
 
 # write green status message to console
@@ -123,8 +124,8 @@ on_exit()
 {
 	for ((onex=${#on_exit_items[@]}-1; onex>=0; onex--))
 	do
-		echo "On_Exit: ${on_exit_items[$onex]}" >>$LOGFILE
-		${on_exit_items[$onex]} >>$LOGFILE 2>&1
+		echo "On_Exit: ${on_exit_items[$onex]}" >>$LOG_FILE
+		${on_exit_items[$onex]} >>$LOG_FILE 2>&1
 	done
 	on_exit_items=""
 	trap - EXIT
@@ -153,7 +154,7 @@ graceful_umount()
 	let steps=$secs*100
 	for st in `seq 1 $steps`
 	do
-		umount $1 >>$LOGFILE 2>&1
+		umount $1 >>$LOG_FILE 2>&1
 		mount | grep $1 >/dev/null 2>&1
 		[ $? -eq 0 ] || return 0
 		sleep 0.01

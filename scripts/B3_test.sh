@@ -5,8 +5,12 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 
 echo "test begin ..."
 
+##### check run condition #########
+#running_any $STRONGSWANHOSTS && die "Please stop test environment before running $0"
+
 export TEST_DATE="$(date +%Y%m%d%H%M%S)"
-export LOGFILE=${DIR}/log/log${TEST_DATE}.txt
+export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
+
 
 
 

@@ -8,4 +8,7 @@ echo "config network and certs begin ..."
 ##### check run condition #########
 
 
+#set_network
+#copy_vm_config_files
+
 echo "config network and certs end."

@@ -1,14 +1,14 @@
-======================== A1. host install ====================================
-1. install strongswan env；
-
-======================== A2. make base OS image ==============================
+======================== A1. make base OS image ==============================
 
 1. call create_os.sh only one time, to create os image of echo release version;
 
-======================== A3. make strongswan image ===========================
+======================== A2. make strongswan image ===========================
 
 1. base on the os image above, call create_strongswan.sh to create increase image, 
    and install strongswan and runtime env in this image;
+
+======================== A3. install strongswan env ==========================
+1. install strongswan env；
 
 ==============================================================================
 ==============================================================================
