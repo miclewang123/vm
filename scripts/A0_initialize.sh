@@ -25,6 +25,14 @@ remove_files()
   # if [[ $continue == 'y' || $continue == 'Y' ]]; then
     execute "rm -rf ${DIR}/rootfs/qcow2/vpn/*.${IMG_EXT}"
   # fi
+
+    execute "rm -rf ${DIR}/vms/*"
+
+    vms=`virsh list --name`
+    for vm in $vms
+    do
+      execute "virsh destroy $vm"
+    done
 }
 
 #create_folder
