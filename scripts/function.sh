@@ -22,6 +22,15 @@ export VNC_PORT=5901
 export VM_UUID="1f35c25d-6a7b-4ee1-2461-d7e50000"
 export IMG_EXT="qcow2"
 
+############ define step #####################
+export BUILD_INITIALIZE="yes"
+export BUILD_BASE="yes"
+export BUILD_GUEST="yes"
+
+export BUILD_STRONGSWAN="yes"
+export BUILD_VPN="yes"
+##############################################
+
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)

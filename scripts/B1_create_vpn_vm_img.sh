@@ -2,8 +2,7 @@
 
 DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/function.sh
-
-echo "create vpn and vm begin ..."
+. $DIR_SCRIPTS/A2_create_strongswan.sh
 
 ##### check run condition #########
 
@@ -86,15 +85,21 @@ create_vm_xml()
 # $1 - NODE_NAME: node name
 # $2 - MEMORY(MB): memory
 # $3 - VCPU: cpu count
-# $4 - ip1 address: 
-# $5 - gw1 address: 
-# $6 - bridge1: 
+# $4 - ip address: local net ip
+# $5 - gw address: local net gateway
+# $6 - bridge_no: local net bridge no
 create_vm()
 {
+  PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}" 
+  [ ! -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
+
+  NEW_IMG="${DIR}/rootfs/qcow2/lan$6/rootfs_vm_$1.${IMG_EXT}"
+  create_img_from_parent ${NEW_IMG} ${PARENT_IMG}
+
   IMAGE="${DIR}/boot_image/bzImage_amd64_virtio"
   IMAGE=${IMAGE//\//\\\/}
 
-  ROOT_FS="${DIR}/rootfs/rootfs_debian_amd64.${IMG_EXT}" 
+  ROOT_FS=$NEW_IMG
   ROOT_FS=${ROOT_FS//\//\\\/}
   
   get_vm_uuid
@@ -108,18 +113,21 @@ create_vm()
 # $1 - NODE_NAME: node name
 # $2 - MEMORY(MB): memory
 # $3 - VCPU: cpu count
-# $4 - ip1 address: 
-# $5 - gw1 address: 
-# $6 - bridge1: 
-# $7 - ip2 address: 
-# $8 - gw2 address: 
-# $9 - bridge2: 
+# $4 - ip address: external net ip 
+# $5 - gw address: external net gateway
+# $6 - bridge_no: external net bridge no
 create_vpn()
 {
+  PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}" 
+  [ ! -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
+
+  NEW_IMG="${DIR}/rootfs/qcow2/vpn/rootfs_vpn_$1.${IMG_EXT}"
+  create_img_from_parent ${NEW_IMG} ${PARENT_IMG}
+
   IMAGE="${DIR}/boot_image/bzImage_amd64_virtio"
   IMAGE=${IMAGE//\//\\\/}
 
-  ROOT_FS="${DIR}/rootfs/rootfs_debian_amd64.${IMG_EXT}" 
+  ROOT_FS=${NEW_IMG}
   ROOT_FS=${ROOT_FS//\//\\\/}
   
   get_vm_uuid
@@ -128,7 +136,3 @@ create_vpn()
 
   for_create_vm $1 "x86_64" $2 $3 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT $VM_UUID
 }
-
-create_vm "node_1" 200 2
-
-echo "create vpn and vm end."

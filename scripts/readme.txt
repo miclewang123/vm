@@ -1,19 +1,23 @@
-======================== A1. make base OS image ==============================
+======================== A0. initilize ======================================
+
+1. remove old files and create folder;
+
+======================== A1. make base OS image =============================
 
 1. call create_os.sh only one time, to create os image of echo release version;
 
-======================== A2. make strongswan image ===========================
+======================== A2. make strongswan image ==========================
 
 1. base on the os image above, call create_strongswan.sh to create increase image, 
    and install strongswan and runtime env in this image;
 
-======================== A3. install strongswan env ==========================
+======================== A3. install strongswan env =========================
 1. install strongswan env；
 
-==============================================================================
-==============================================================================
+=============================================================================
+=============================================================================
 
-======================== B1. make vm and vpn image ===========================
+======================== B1. make vm and vpn image ==========================
 
 1. read vm or vpn information from file test.conf
 
@@ -25,7 +29,7 @@
 
 4. start vm and vpn OS;
 
-======================== B2. config ==========================================
+======================== B2. config vm and vpn ==============================
 
 1. read iptables, rules and set iptables and rules of each vm or vpn;
 
@@ -42,19 +46,19 @@
 2. compare test.txt to the right test result test_right.txt automatically, 
    if no change, test pass, else no pass;
 
-======================== B4. remove config ======================================
+======================== B4. remove config ==================================
 
 1. remove certs;
 
 2. remove iptable and rules setting;
 
-======================== B5. destroy vm and vpn images ========================
+======================== B5. destroy vm and vpn images ======================
 
 1. stop vm and vpn OS;
 2. destroy vm and vpn images;
 
-==============================================================================
-==============================================================================
+=============================================================================
+=============================================================================
 
 注：
 A is prepare image；

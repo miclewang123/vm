@@ -1,6 +1,6 @@
 <domain type='kvm'>
   <name>node_1</name>
-  <uuid>1f35c25d-6a7b-4ee1-2461-d7e530e75901</uuid>
+  <uuid>1f35c25d-6a7b-4ee1-2461-d7e500005901</uuid>
   <memory unit='MiB'>200</memory>
   <currentMemory unit='MiB'>200</currentMemory>
   <vcpu placement='static'>2</vcpu>
@@ -24,7 +24,7 @@
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='writethrough'/>
-      <source file='/home/wangyi/vm/rootfs/rootfs_debian_amd64.qcow2'/>
+      <source file='/home/wangyi/vm/rootfs/rootfs_vm1.qcow2'/>
       <target dev='vda' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
     </disk>
