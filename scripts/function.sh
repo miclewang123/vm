@@ -19,11 +19,18 @@ export DIR="$(dirname ${DIR_SCRIPTS})"
 export TERM=xterm
 export MAC_ID=0
 export VNC_PORT=5901
+export VM_UUID="1f35c25d-6a7b-4ee1-2461-d7e50000"
 
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 NORMAL=$(tput op)
+
+if [ -z "$LOGFILE" ]; then
+  #TEST_DATE="$(date +%Y%m%d%H%M%S)"
+  TEST_DATE=""
+  export LOGFILE=${DIR}/log/test${TEST_DATE}.log
+fi
 
 # exit with given error message
 # $1 - error message

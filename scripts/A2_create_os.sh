@@ -29,10 +29,6 @@ create_base_os()
   execute "qemu-nbd -d ${DEV_NBD}"
 }
 
-#TEST_DATE="$(date +%Y%m%d%H%M%S)"
-TEST_DATE=""
-LOGFILE=${DIR}/log/test${TEST_DATE}.log
-
 create_base_os amd64 debian
 
 echo "create os images end."

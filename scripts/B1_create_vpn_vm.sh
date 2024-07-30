@@ -7,6 +7,12 @@ echo "create vpn and vm begin ..."
 
 ##### check run condition #########
 
+# get_vm_uuid
+# no params
+get_vm_uuid()
+{
+  VM_UUID="${VM_UUID}${VNC_PORT}"
+}
 
 # get_mac_address
 # no params
@@ -33,18 +39,23 @@ get_vnc_port()
 # $6 - BOOT_IMAGE: boot image
 # $7 - QEMU_APP: qemu app name
 # $8 - VNC: vnc port
+# $9 - VM_UUID: vm UUID
 create_vm()
 {
   TPL_DIR=${DIR}/tpl
   TPL_BAK_DIR=${TPL_DIR}/bak
   \cp ${TPL_DIR}/create_vm.tpl ${TPL_BAK_DIR}/
-  create_vm_xml $1 $2 $3 $4 $5 $6 $7 $8
+  create_vm_xml $1 $2 $3 $4 $5 $6 $7 $8 $9
   mkdir -p ${DIR}/vms/$1/
   rm -f ${DIR}/vms/$1/create_vm.xml 
   mv ${TPL_BAK_DIR}/create_vm.tpl ${DIR}/vms/$1/create_vm.xml
-
-  virsh define ${DIR}/vms/$1/create_vm.xml
-  virsh start $1
+  execute "chmod 777 ${DIR}/vms/$1/create_vm.xml"
+  virsh create ${DIR}/vms/$1/create_vm.xml
+  if [ $? -eq 0 ]; then
+    echo_ok "vm $1 create OK."
+  else
+    echo_failed "vm $1 create failed!"
+  fi
 }
 
 # create_vm_xml
@@ -56,7 +67,7 @@ create_vm()
 # $6 - BOOT_IMAGE: boot image
 # $7 - QEMU_APP: qemu app name
 # $8 - VNC: vnc port
-
+# $9 - VM_UUID: vm UUID
 create_vm_xml()
 {
   searchandreplace %NODE_NAME%    $1 $TPL_BAK_DIR
@@ -67,15 +78,19 @@ create_vm_xml()
   searchandreplace %BOOT_IMAGE%   $6 $TPL_BAK_DIR
   searchandreplace %QEMU_APP%     $7 $TPL_BAK_DIR
   searchandreplace %VNC%          $8 $TPL_BAK_DIR
+  searchandreplace %VM_UUID%      $9 $TPL_BAK_DIR
 }
 
-#DIR1="\/home\/wangyi\/vm"
 ROOT_FS="${DIR}/rootfs/rootfs_debian_amd64.qcow2" 
-IMAGE="${DIR}/boot_image/Image_amd64"
+IMAGE="${DIR}/boot_image/bzImage_amd64_virtio"
 
 ROOT_FS=${ROOT_FS//\//\\\/}
 IMAGE=${IMAGE//\//\\\/}
 
-create_vm "node_1" "x86_64" 200 2 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" 5910
+get_vm_uuid
+get_mac_address
+get_vnc_port
+
+create_vm "node_1" "x86_64" 200 2 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT $VM_UUID
 
 echo "create vpn and vm end."
