@@ -49,11 +49,11 @@ fi
 
 echo "create vpn and vm begin ..."
 if [ $BUILD_GUEST = "yes" ];	then
-  create_vm "vm1" 200 2 
+  create_vm "vm1" 200 2 1
 fi
 
 if [ $BUILD_VPN = "yes" ];	then
-	create_vpn "vpn1" 200 2 
+	create_vpn "vpn1" 200 2 0 
 fi
 echo "create vpn and vm end."
 
