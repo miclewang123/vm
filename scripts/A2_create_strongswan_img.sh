@@ -23,10 +23,8 @@ create_img_from_parent()
   NBD_PARTITION=${DEV_NBD}
   execute "mount $NBD_PARTITION $LOOP_DIR"
   execute "mount -t proc none $LOOP_DIR/proc"
-  
-  execute "cp /etc/resolv.conf $LOOP_DIR/etc/resolv.conf"
 
-  #execute "rm -rf $LOOP_DIR/*"
+  execute "cp /etc/resolv.conf $LOOP_DIR/etc/resolv.conf"
 
   execute "umount $LOOP_DIR/proc"
   execute "umount $LOOP_DIR"
@@ -118,10 +116,13 @@ create_img_from_parent()
   #     $DIR/build-guestimages
   #   fi
   # fi
+
+  #execute "rm -rf $LOOP_DIR/*"
+
 }
 
 #create_strongswan_img
-create_strongswan_img_from_base()
+create_strongswan_img()
 {
   STRONGSWAN_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}"
   PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"

@@ -36,9 +36,9 @@ if [ $BUILD_BASE = "yes" ];	then
 fi
 
 if [ $BUILD_STRONGSWAN = "yes" ];	then
-  # A2 create_strongswan_img_from_base
+  # A2 create_strongswan_img
   echo "create strongswan image begin ..."
-	create_strongswan_img_from_base 
+	create_strongswan_img 
   echo "create strongswan image end."
 
   # A3 install strongswan
