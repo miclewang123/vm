@@ -19,6 +19,20 @@ echo "test begin ..."
 export TEST_DATE="$(date +%Y%m%d%H%M%S)"
 export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
 
+[ `id -u` -eq 0 ] || die "You must be root to run $0"
+
+VMS=`virsh list --name`
+if [ -n "$VMS" ]; then
+  read -p "Vms ($VMS) is running, close them first [y/n]?" continue
+  if [[ $continue == 'y' || $continue == 'Y' ]]; then
+    for VM in $VMS
+    do
+      execute "virsh destroy $VM"
+    done
+  else
+    die "Please stop vms ($VMS) before continue $0"
+  fi
+fi
 
 # A0
 if [ $BUILD_INITIALIZE = "yes" ];	then
@@ -49,11 +63,17 @@ fi
 
 echo "create vpn and vm begin ..."
 if [ $BUILD_GUEST = "yes" ];	then
+  execute "rm -rf ${DIR}/vms/lan*"
+  execute "rm -rf ${DIR}/rootfs/qcow2/lan*/*.${IMG_EXT}"
+
   create_vm "vm1" 200 2 1
 fi
 
 if [ $BUILD_VPN = "yes" ];	then
-	create_vpn "vpn1" 200 2 0 
+  execute "rm -rf ${DIR}/vms/vpn"
+  execute "rm -rf ${DIR}/rootfs/qcow2/vpn/*.${IMG_EXT}"
+	
+  create_vpn "vpn1" 200 2 0 
 fi
 echo "create vpn and vm end."
 

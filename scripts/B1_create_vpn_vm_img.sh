@@ -2,7 +2,6 @@
 
 DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/function.sh
-. $DIR_SCRIPTS/A2_create_strongswan.sh
 
 ##### check run condition #########
 
@@ -32,16 +31,22 @@ get_vnc_port()
 # $7 - QEMU_APP: qemu app name
 # $8 - VNC: vnc port
 # $9 - VM_UUID: vm UUID
+# $10- is_vpn: true or false
+# $11- bridge no: vpn is no use
 for_create_vm()
 {
 
   TPL_DIR=${DIR}/tpl
   TPL_BAK_DIR=${TPL_DIR}/bak
   \cp ${TPL_DIR}/create_vm.tpl ${TPL_BAK_DIR}/
-  create_vm_xml $1 $2 $3 $4 $5 $6 $7 $8 $9
+  create_vm_xml $@
   mkdir -p ${DIR}/vms/$1/
-  rm -f ${DIR}/vms/$1/create_vm.xml 
-  mv ${TPL_BAK_DIR}/create_vm.tpl ${DIR}/vms/$1/create_vm.xml
+  rm -f ${DIR}/vms/$1/create_vm.xml
+  if [ $10 ]; then  #vpn
+    mv ${TPL_BAK_DIR}/create_vm.tpl ${DIR}/vms/vpn/$1/create_vm.xml
+  else
+    mv ${TPL_BAK_DIR}/create_vm.tpl ${DIR}/vms/lan$11/$1/create_vm.xml
+  fi
   execute "chmod 777 ${DIR}/vms/$1/create_vm.xml"
   virsh create ${DIR}/vms/$1/create_vm.xml
   if [ $? -eq 0 ]; then
@@ -98,7 +103,7 @@ create_vm()
   get_mac_address
   get_vnc_port
 
-  for_create_vm $1 "x86_64" $2 $3 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT ${VM_UUID}${VNC_PORT}
+  for_create_vm $1 "x86_64" $2 $3 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT ${VM_UUID}${VNC_PORT} false $4
 }
 
 # create_vpn
@@ -125,5 +130,5 @@ create_vpn()
   get_mac_address
   get_vnc_port
 
-  for_create_vm $1 "x86_64" $2 $3 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT ${VM_UUID}${VNC_PORT}
+  for_create_vm $1 "x86_64" $2 $3 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT ${VM_UUID}${VNC_PORT} true $4
 }

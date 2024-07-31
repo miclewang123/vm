@@ -8,8 +8,8 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 # $2 - parent img name
 create_img_from_parent()
 {
-  LOOP_DIR="${DIR}/loop"
-  [ -d ${LOOP_DIR} ] ||  mkdir -p ${LOOP_DIR}
+#  DIR_MNT="${DIR}/loop"
+  [ -d ${DIR_MNT} ] ||  mkdir -p ${DIR_MNT}
 
   DEV_NBD="/dev/nbd0"
   load_qemu_nbd
@@ -21,26 +21,26 @@ create_img_from_parent()
   execute "partprobe $DEV_NBD"
 
   NBD_PARTITION=${DEV_NBD}
-  execute "mount $NBD_PARTITION $LOOP_DIR"
-  execute "mount -t proc none $LOOP_DIR/proc"
+  execute "mount $NBD_PARTITION $DIR_MNT"
+  execute "mount -t proc none $DIR_MNT/proc"
 
-  execute "cp /etc/resolv.conf $LOOP_DIR/etc/resolv.conf"
+  execute "cp /etc/resolv.conf $DIR_MNT/etc/resolv.conf"
 
-  execute "umount $LOOP_DIR/proc"
-  execute "umount $LOOP_DIR"
+  execute "umount $DIR_MNT/proc"
+  execute "umount $DIR_MNT"
   
   execute "qemu-nbd -d $DEV_NBD"
 
 
   # mkdir -p $SHARED_DIR
-  # mkdir -p $LOOP_DIR/root/shared
+  # mkdir -p $DIR_MNT/root/shared
   # log_action "Mounting $SHARED_DIR as /root/shared"
-  # execute "mount -o bind $SHARED_DIR $LOOP_DIR/root/shared"
-  # do_on_exit umount $LOOP_DIR/root/shared
+  # execute "mount -o bind $SHARED_DIR $DIR_MNT/root/shared"
+  # do_on_exit umount $DIR_MNT/root/shared
 
   # log_action "Copy /etc/resolv.conf"
-  # execute "cp /etc/resolv.conf $LOOP_DIR/etc/resolv.conf"
-  # do_on_exit rm $LOOP_DIR/etc/resolv.conf
+  # execute "cp /etc/resolv.conf $DIR_MNT/etc/resolv.conf"
+  # do_on_exit rm $DIR_MNT/etc/resolv.conf
 
   # log_action "Remove SWID tags of previous strongSwan versions"
   # execute_chroot "find /usr/local/share -path '*strongswan*' -name *.swidtag -delete"
@@ -50,10 +50,10 @@ create_img_from_parent()
   #   SRC_GID=$(stat -c '%g' $SWAN_DIR)
   #   SRC_USER=$(stat -c '%U' $SWAN_DIR)
 
-  #   mkdir -p $LOOP_DIR/root/strongswan
+  #   mkdir -p $DIR_MNT/root/strongswan
   #   log_action "Mounting $SWAN_DIR as /root/strongswan"
-  #   execute "bindfs -u $SRC_UID -g $SRC_GID --create-for-user=$SRC_UID --create-for-group=$SRC_GID $SWAN_DIR $LOOP_DIR/root/strongswan"
-  #   do_on_exit umount $LOOP_DIR/root/strongswan
+  #   execute "bindfs -u $SRC_UID -g $SRC_GID --create-for-user=$SRC_UID --create-for-group=$SRC_GID $SWAN_DIR $DIR_MNT/root/strongswan"
+  #   do_on_exit umount $DIR_MNT/root/strongswan
 
   #   log_action "Determine strongSwan version"
   #   desc=`runuser -u $SRC_USER -- git -C $SWAN_DIR describe --exclude 'android-*' --dirty`
@@ -74,12 +74,12 @@ create_img_from_parent()
   #   echo "Building and installing strongSwan and all other software"
   #   if [ -d "$RECPDIR/patches" ]
   #   then
-  #     execute "cp -r $RECPDIR/patches $LOOP_DIR/root/shared/compile" 0
+  #     execute "cp -r $RECPDIR/patches $DIR_MNT/root/shared/compile" 0
   #   fi
   #   RECIPES=`ls $RECPDIR/*.mk | xargs -n1 basename`
   #   log_action "Whitelist all Git repositories"
-  #   echo "[safe]"             > $LOOP_DIR/root/.gitconfig
-  #   echo "    directory = *" >> $LOOP_DIR/root/.gitconfig
+  #   echo "[safe]"             > $DIR_MNT/root/.gitconfig
+  #   echo "    directory = *" >> $DIR_MNT/root/.gitconfig
   #   log_status 0
   # else
   #   echo "Building and installing strongSwan"
@@ -99,7 +99,7 @@ create_img_from_parent()
   #     cp $RECPDIR/$r $SHARED_DIR/build-strongswan
   #     execute_chroot "make SRC_DIR=/root/strongswan BUILDDIR=/root/shared/build-strongswan -f /root/shared/build-strongswan/$r"
   #   else
-  #     cp $RECPDIR/$r ${LOOP_DIR}/root/shared/compile
+  #     cp $RECPDIR/$r ${DIR_MNT}/root/shared/compile
   #     execute_chroot "make SWANVERSION=$TARBALL -C /root/shared/compile -f $r"
   #   fi
   # done
@@ -117,7 +117,7 @@ create_img_from_parent()
   #   fi
   # fi
 
-  #execute "rm -rf $LOOP_DIR/*"
+  #execute "rm -rf $DIR_MNT/*"
 
 }
 
@@ -127,5 +127,6 @@ create_strongswan_img()
   STRONGSWAN_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}"
   PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
 
+  execute "rm -rf ${STRONGSWAN_IMG}"
   create_img_from_parent ${STRONGSWAN_IMG} ${PARENT_IMG}
 }

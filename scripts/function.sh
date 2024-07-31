@@ -16,6 +16,7 @@
 
 DIR_SCRIPTS="$(dirname `readlink -f $0`)"
 export DIR="$(dirname ${DIR_SCRIPTS})"
+export DIR_MNT=${DIR}/rootfs/mnt_rootfs
 export TERM=xterm
 export MAC_ID=0
 export VNC_PORT=5901
@@ -23,8 +24,8 @@ export VM_UUID="1f35c25d-6a7b-4ee1-2461-d7e50000"
 export IMG_EXT="qcow2"
 
 ############ define step #####################
-export BUILD_INITIALIZE="yes"
-export BUILD_BASE="yes"
+export BUILD_INITIALIZE="no"
+export BUILD_BASE="no"
 export BUILD_GUEST="yes"
 
 export BUILD_STRONGSWAN="yes"
@@ -79,7 +80,7 @@ execute()
 # $1 - command to execute
 execute_chroot()
 {
-	execute "chroot $LOOP_DIR env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin $@"
+	execute "chroot $DIR_MNT env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin $@"
 }
 
 # write green status message to console
