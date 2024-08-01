@@ -13,15 +13,15 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/B5_destroy_img.sh
 
 ############ define step #####################
-export INITIALIZE="yes"
+export INITIALIZE="no"
 
 export BUILD_BASE="no"
 export BUILD_STRONGSWAN="no"
 
 export INSTALL_STRONGSWAN="no"
 
-export BUILD_VM="yes"
-export BUILD_VPN="yes"
+export BUILD_VM="no"
+export BUILD_VPN="no"
 
 export CONFIG_NET="yes"
 export RUN_TEST="yes"
@@ -91,6 +91,7 @@ if [ $BUILD_VPN = "yes" ];	then
   echo_ok "create vpn end.\n"
 fi
 
+###############################################################
 if [ $CONFIG_NET = "yes" ];	then
   # B2 config
   echo_ok "config network and certs begin ..."
@@ -106,6 +107,7 @@ if [ $RUN_TEST = "yes" ];	then
   stop_test 
   echo_ok "test end.\n"
 fi
+###############################################################
 
 if [ $DESTROY_VM_VPN = "yes" ];	then
   echo_ok "destroy images begin ..."
