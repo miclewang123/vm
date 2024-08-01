@@ -17,6 +17,8 @@
 DIR_SCRIPTS="$(dirname `readlink -f $0`)"
 export DIR="$(dirname ${DIR_SCRIPTS})"
 export DIR_MNT=${DIR}/rootfs/mnt_rootfs
+export DIR_TPL=${DIR}/tpl
+
 export TERM=xterm
 export MAC_ID=0
 export VNC_PORT=5901
@@ -221,4 +223,18 @@ function searchandreplace {
 		sed -i -e "s/$SEARCHSTRING/$REPLACESTRING/g" "$eachfoundfile"
 	done
 
+}
+
+#############################################
+# search and replace strings in a file
+#
+function file_searchandreplace {
+
+	SEARCHSTRING="$1"
+	REPLACESTRING="$2"
+	DESTFILE="$3"
+
+	[ -f "$DESTFILE" ] || die "$DESTFILE is not a file!"
+
+	sed -i -e "s/$SEARCHSTRING/$REPLACESTRING/g" "$DESTFILE"
 }

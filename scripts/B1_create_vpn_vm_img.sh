@@ -21,49 +21,15 @@ get_vnc_port()
   VNC_PORT=$(expr ${VNC_PORT} + 1)
 }
 
-# for_create_vm
-# $1 - NODE_NAME: node name
-# $2 - ARCH: x86_64 or aarch64
-# $3 - MEMORY(MB): memory
-# $4 - VCPU: cpu count
-# $5 - ROOT_FS: root file system
-# $6 - BOOT_IMAGE: boot image
-# $7 - QEMU_APP: qemu app name
-# $8 - VNC: vnc port
-# $9 - VM_UUID: vm UUID
-# $10- is_vpn: true or false
-# $11- bridge no: no use for vpn
-for_create_vm()
+# move_xml_to_vms
+# $1 - path: path of create_vm.xml
+move_xml_to_vms()
 {
-  TPL_DIR=${DIR}/tpl
-  TPL_BAK_DIR=${TPL_DIR}/bak
-  \cp ${TPL_DIR}/create_vm.tpl ${TPL_BAK_DIR}/
-  create_vm_xml $@
+  mkdir -p $1
+  rm -f $1/create_vm.xml
+  mv ${DIR_TPL}/create_vm.tpl.bak $1/create_vm.xml
 
-  VM_PATH=""
-  if [ $10 ]; then  #vpn
-    VM_PATH="${DIR}/vms/vpn/$1"
-  else
-    VM_PATH="${DIR}/vms/lan$11/$1"
-  fi
-
-  mkdir -p ${VM_PATH}
-  rm -f ${VM_PATH}/create_vm.xml  
-  mv ${TPL_BAK_DIR}/create_vm.tpl ${VM_PATH}/create_vm.xml
-
-  execute "chmod 777 ${VM_PATH}/create_vm.xml"
-  virsh create ${VM_PATH}/create_vm.xml
-
-  VM="VM"
-  if [ $10 ]; then
-    VM="VPN"
-  fi
-
-  if [ $? -eq 0 ]; then
-    echo_ok "$VM $1 create OK."
-  else
-    echo_failed "$VM $1 create failed!"
-  fi
+  execute "chmod 777 $1/create_vm.xml"
 }
 
 # create_vm_xml
@@ -78,15 +44,16 @@ for_create_vm()
 # $9 - VM_UUID: vm UUID
 create_vm_xml()
 {
-  searchandreplace %NODE_NAME%    $1 $TPL_BAK_DIR
-  searchandreplace %ARCH%         $2 $TPL_BAK_DIR
-  searchandreplace %MEMORY%       $3 $TPL_BAK_DIR
-  searchandreplace %VCPU%         $4 $TPL_BAK_DIR
-  searchandreplace %ROOT_FS%      $5 $TPL_BAK_DIR
-  searchandreplace %BOOT_IMAGE%   $6 $TPL_BAK_DIR
-  searchandreplace %QEMU_APP%     $7 $TPL_BAK_DIR
-  searchandreplace %VNC%          $8 $TPL_BAK_DIR
-  searchandreplace %VM_UUID%      $9 $TPL_BAK_DIR
+  TPL_BAK="${DIR_TPL}/create_vm.tpl.bak"
+  file_searchandreplace %NODE_NAME%    $1 $TPL_BAK
+  file_searchandreplace %ARCH%         $2 $TPL_BAK
+  file_searchandreplace %MEMORY%       $3 $TPL_BAK
+  file_searchandreplace %VCPU%         $4 $TPL_BAK
+  file_searchandreplace %ROOT_FS%      $5 $TPL_BAK
+  file_searchandreplace %BOOT_IMAGE%   $6 $TPL_BAK
+  file_searchandreplace %QEMU_APP%     $7 $TPL_BAK
+  file_searchandreplace %VNC%          $8 $TPL_BAK
+  file_searchandreplace %VM_UUID%      $9 $TPL_BAK
 }
 
 # create_vm
@@ -113,7 +80,9 @@ create_vm()
   get_mac_address
   get_vnc_port
 
-  for_create_vm $1 "x86_64" $2 $3 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT ${VM_UUID}${VNC_PORT} false $4
+  cp -f ${DIR_TPL}/create_vm.tpl ${DIR_TPL}/create_vm.tpl.bak
+  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID}${VNC_PORT}
+  move_xml_to_vms ${DIR}/vms/lan$4/$1
 }
 
 # create_vpn
@@ -140,5 +109,36 @@ create_vpn()
   get_mac_address
   get_vnc_port
 
-  for_create_vm $1 "x86_64" $2 $3 ${ROOT_FS} ${IMAGE} "qemu-system-x86_64" $VNC_PORT ${VM_UUID}${VNC_PORT} true $4
+  cp -f ${DIR_TPL}/create_vm.tpl ${DIR_TPL}/create_vm.tpl.bak
+  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID}${VNC_PORT}
+  move_xml_to_vms ${DIR}/vms/vpn/$1
+}
+
+# start_vm
+# $1 - NODE_NAME: node name
+# $2 - bridge_no: local net bridge no
+start_vm()
+{
+  VM_PATH="${DIR}/vms/lan$2/$1"
+  virsh create ${VM_PATH}/create_vm.xml
+
+  if [ $? -eq 0 ]; then
+    echo_ok "VM $1 create OK."
+  else
+    echo_failed "VM $1 create failed!"
+  fi
+}
+
+# start_vpn
+# $1 - NODE_NAME: node name
+start_vpn()
+{
+  VM_PATH="${DIR}/vms/vpn/$1"
+  virsh create ${VM_PATH}/create_vm.xml
+
+  if [ $? -eq 0 ]; then
+    echo_ok "VPN $1 create OK."
+  else
+    echo_failed "VPN $1 create failed!"
+  fi
 }

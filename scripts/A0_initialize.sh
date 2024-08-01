@@ -43,5 +43,6 @@ create_folder()
   [ ! -d  "${DIR}/loop" ] || mkdir -p "${DIR}/loop"
   [ ! -d  "${DIR}/log" ] || mkdir -p "${DIR}/log"
   [ ! -d  "${DIR}/vms" ] || mkdir -p "${DIR}/vms"
+
   chmod -R +222 *
 }
