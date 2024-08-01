@@ -3,12 +3,49 @@
 DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/function.sh
 
+# install_strongswan_env
+install_strongswan_env()
+{
+  return 0
+  # INC=automake,autoconf,libtool,bison,flex,gperf,pkg-config,gettext,less,locales
+  # apt install -y $INC
+
+  # INC=build-essential,libgmp-dev,libldap2-dev,libcurl4-openssl-dev,ethtool
+  # apt install -y $INC
+
+  # INC=libxml2-dev,libtspi-dev,libsqlite3-dev,openssh-server,tcpdump,psmisc
+  # apt install -y $INC
+
+  # INC=openssl,vim,sqlite3,conntrack,gdb,cmake,libltdl-dev,wget,gnupg,man-db
+  # apt install -y $INC
+
+  # INC=libboost-thread-dev,libboost-system-dev,git,iperf,htop,valgrind,strace
+  # apt install -y $INC
+
+  # INC=gnat,gprbuild,acpid,acpi-support-base,libldns-dev,libunbound-dev
+  # apt install -y $INC
+
+  # INC=dnsutils,libsoup2.4-dev,ca-certificates,unzip,libsystemd-dev
+  # apt install -y $INC
+
+  # INC=python3,python3-setuptools,python3-dev,python3-daemon,python3-venv
+  # apt install -y $INC
+
+  # INC=apt-transport-https,libjson-c-dev,libxslt1-dev,libapache2-mod-wsgi-py3
+  # apt install -y $INC
+
+  # INC=libxerces-c-dev,rsyslog
+  # apt install -y $INC
+
+  # INC=iptables-dev
+  # apt install -y $INC
+}
+
 #create_img_from_parent
 # $1 - new img name
 # $2 - parent img name
 create_img_from_parent()
 {
-#  DIR_MNT="${DIR}/loop"
   [ -d ${DIR_MNT} ] ||  mkdir -p ${DIR_MNT}
 
   DEV_NBD="/dev/nbd0"
@@ -26,11 +63,23 @@ create_img_from_parent()
 
   execute "cp /etc/resolv.conf $DIR_MNT/etc/resolv.conf"
 
+  execute "install_strongswan_env"
+
   execute "umount $DIR_MNT/proc"
   execute "umount $DIR_MNT"
   
   execute "qemu-nbd -d $DEV_NBD"
+}
 
+#create_strongswan_img
+create_strongswan_img()
+{
+  STRONGSWAN_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}"
+  PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
+
+  execute "rm -rf ${STRONGSWAN_IMG}"
+  create_img_from_parent ${STRONGSWAN_IMG} ${PARENT_IMG}
+}
 
   # mkdir -p $SHARED_DIR
   # mkdir -p $DIR_MNT/root/shared
@@ -118,15 +167,3 @@ create_img_from_parent()
   # fi
 
   #execute "rm -rf $DIR_MNT/*"
-
-}
-
-#create_strongswan_img
-create_strongswan_img()
-{
-  STRONGSWAN_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}"
-  PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
-
-  execute "rm -rf ${STRONGSWAN_IMG}"
-  create_img_from_parent ${STRONGSWAN_IMG} ${PARENT_IMG}
-}

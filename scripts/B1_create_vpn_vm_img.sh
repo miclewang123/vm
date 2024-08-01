@@ -32,27 +32,37 @@ get_vnc_port()
 # $8 - VNC: vnc port
 # $9 - VM_UUID: vm UUID
 # $10- is_vpn: true or false
-# $11- bridge no: vpn is no use
+# $11- bridge no: no use for vpn
 for_create_vm()
 {
-
   TPL_DIR=${DIR}/tpl
   TPL_BAK_DIR=${TPL_DIR}/bak
   \cp ${TPL_DIR}/create_vm.tpl ${TPL_BAK_DIR}/
   create_vm_xml $@
-  mkdir -p ${DIR}/vms/$1/
-  rm -f ${DIR}/vms/$1/create_vm.xml
+
+  VM_PATH=""
   if [ $10 ]; then  #vpn
-    mv ${TPL_BAK_DIR}/create_vm.tpl ${DIR}/vms/vpn/$1/create_vm.xml
+    VM_PATH="${DIR}/vms/vpn/$1"
   else
-    mv ${TPL_BAK_DIR}/create_vm.tpl ${DIR}/vms/lan$11/$1/create_vm.xml
+    VM_PATH="${DIR}/vms/lan$11/$1"
   fi
-  execute "chmod 777 ${DIR}/vms/$1/create_vm.xml"
-  virsh create ${DIR}/vms/$1/create_vm.xml
+
+  mkdir -p ${VM_PATH}
+  rm -f ${VM_PATH}/create_vm.xml  
+  mv ${TPL_BAK_DIR}/create_vm.tpl ${VM_PATH}/create_vm.xml
+
+  execute "chmod 777 ${VM_PATH}/create_vm.xml"
+  virsh create ${VM_PATH}/create_vm.xml
+
+  VM="VM"
+  if [ $10 ]; then
+    VM="VPN"
+  fi
+
   if [ $? -eq 0 ]; then
-    echo_ok "vm $1 create OK."
+    echo_ok "$VM $1 create OK."
   else
-    echo_failed "vm $1 create failed!"
+    echo_failed "$VM $1 create failed!"
   fi
 }
 

@@ -14,14 +14,14 @@ check_commands bunzip2 bzcat make wget
 create_base_os()
 {
   execute "rm -rf ${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
-  
+
   DEV_NBD="/dev/nbd0"
   load_qemu_nbd
 
   BASE_ROOTFS=${DIR}/rootfs/qcow2/rootfs_${2}_${1}.${IMG_EXT}
   [ ! -f ${BASE_ROOTFS} ] ||  die "${BASE_ROOTFS} file is existed, please remove it first!"
   
-  echo "`date`, building $BASE_ROOTFS" >> $LOG_FILE
+  echo_ok "`date`, building $BASE_ROOTFS" >> $LOG_FILE
 
   execute "qemu-img create -f ${IMG_EXT} ${BASE_ROOTFS} 20G -o preallocation=off" 1
 	execute "qemu-nbd -c ${DEV_NBD} ${BASE_ROOTFS}"
@@ -31,69 +31,81 @@ create_base_os()
   execute "mount ${DEV_NBD} ${DIR_MNT}"
   execute "cp -af ${DIR}/rootfs/rootfs_${2}_${1}/* ${DIR_MNT}"
 
-  # package includes/excludes
-  INC=automake,autoconf,libtool,bison,flex,gperf,pkg-config,gettext,less,locales
-  INC=$INC,build-essential,libgmp-dev,libldap2-dev,libcurl4-openssl-dev,ethtool
-  INC=$INC,libxml2-dev,libtspi-dev,libsqlite3-dev,openssh-server,tcpdump,psmisc
-  INC=$INC,openssl,vim,sqlite3,conntrack,gdb,cmake,libltdl-dev,wget,gnupg,man-db
-  INC=$INC,libboost-thread-dev,libboost-system-dev,git,iperf,htop,valgrind,strace
-  INC=$INC,gnat,gprbuild,acpid,acpi-support-base,libldns-dev,libunbound-dev
-  INC=$INC,dnsutils,libsoup2.4-dev,ca-certificates,unzip,libsystemd-dev
-  INC=$INC,python3,python3-setuptools,python3-dev,python3-daemon,python3-venv,
-  INC=$INC,apt-transport-https,libjson-c-dev,libxslt1-dev,libapache2-mod-wsgi-py3
-  INC=$INC,libxerces-c-dev,rsyslog
-  INC=$INC,iptables-dev
-  INC=$INC,libahven7-dev,libxmlada-schema8-dev,libgmpada8-dev
-  INC=$INC,libalog4-dev,dbus-user-session
-  SERVICES="apache2 dbus isc-dhcp-server slapd bind9 freeradius"
-  INC=$INC,${SERVICES// /,}
+#   # package includes/excludes
+#   INC=automake autoconf libtool bison flex gperf pkg-config gettext less locales
+#   INC=$INC build-essential libgmp-dev libldap2-dev libcurl4-openssl-dev ethtool
+#   INC=$INC libxml2-dev libtspi-dev libsqlite3-dev openssh-server tcpdump psmisc
+#   INC=$INC openssl vim sqlite3 conntrack gdb cmake libltdl-dev wget gnupg man-db
+#   INC=$INC libboost-thread-dev libboost-system-dev git iperf htop valgrind strace
+#   INC=$INC gnat gprbuild acpid acpi-support-base libldns-dev libunbound-dev
+#   INC=$INC dnsutils libsoup2.4-dev ca-certificates unzip libsystemd-dev
+#   INC=$INC python3 python3-setuptools python3-dev python3-daemon python3-venv 
+#   INC=$INC apt-transport-https libjson-c-dev libxslt1-dev libapache2-mod-wsgi-py3
+#   INC=$INC libxerces-c-dev rsyslog
+#   INC=$INC iptables-dev
+#   INC=$INC libahven7-dev libxmlada-schema8-dev libgmpada8-dev
+#   INC=$INC libalog4-dev dbus-user-session
 
-  PACKAGES=${INC//,/ }
-  for package in $PACKAGES
-  do
-    execute_chroot "apt install -y $package"
-  done
+#   for package in $INC
+#   do
+#     execute_chroot "apt install -y $package"
+#   done
 
-  # read -p "press enter key to continue..."
+#   log_action "Generating locales"
+#   cat > ${DIR_MNT}/etc/locale.gen << EOF
+# de_CH.UTF-8 UTF-8
+# en_US.UTF-8 UTF-8
+# EOF
+#   execute_chroot "locale-gen"
 
-  log_action "Generating locales"
-  cat > ${DIR_MNT}/etc/locale.gen << EOF
-de_CH.UTF-8 UTF-8
-en_US.UTF-8 UTF-8
-EOF
-  execute_chroot "locale-gen"
 
-  # packages to install via APT, for SWIMA tests
-  APT1="libgcrypt20-dev traceroute iptables"
-  APT="tmux"
-  SERVICES="$SERVICES systemd-timesyncd"
 
-  log_action "Update package sources"
-  execute_chroot "apt-get update"
-  log_action "Install packages via APT"
-  execute_chroot "apt-get -y install $APT1"
-  log_action "Move history.log to history.log.1"
-  execute_chroot "mv /var/log/apt/history.log /var/log/apt/history.log.1"
-  log_action "Compress history.log.1 to history.log.1.gz"
-  execute_chroot "gzip /var/log/apt/history.log.1"
-  log_action "Install more packages via APT"
-  execute_chroot "apt-get -y install $APT"
-  log_action "Install packages from custom repo"
-  execute_chroot "apt-get -y upgrade"
 
-  for service in $SERVICES
-  do
-    log_action "Disabling service $service"
-    execute_chroot "systemctl disable $service"
-  done
 
-  log_action "Switching from iptables-nft to iptables-legacy"
-  execute_chroot "update-alternatives --set iptables /usr/sbin/iptables-legacy" 0
-  execute_chroot "update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy" 0
-  log_status 0
 
-  log_action "Disabling root password"
-  execute_chroot "passwd -d root"
+
+
+
+#   SERVICES="apache2 dbus isc-dhcp-server slapd bind9 freeradius"
+
+#   for package in $SERVICES
+#   do
+#     execute_chroot "apt install -y $package"
+#   done
+
+#   # read -p "press enter key to continue..."
+
+#   # packages to install via APT, for SWIMA tests
+#   APT1="libgcrypt20-dev traceroute iptables"
+#   APT="tmux"
+#   SERVICES="$SERVICES systemd-timesyncd"
+
+#   log_action "Update package sources"
+#   execute_chroot "apt-get update"
+#   log_action "Install packages via APT"
+#   execute_chroot "apt-get -y install $APT1"
+#   log_action "Move history.log to history.log.1"
+#   execute_chroot "mv /var/log/apt/history.log /var/log/apt/history.log.1"
+#   log_action "Compress history.log.1 to history.log.1.gz"
+#   execute_chroot "gzip /var/log/apt/history.log.1"
+#   log_action "Install more packages via APT"
+#   execute_chroot "apt-get -y install $APT"
+#   log_action "Install packages from custom repo"
+#   execute_chroot "apt-get -y upgrade"
+
+#   for service in $SERVICES
+#   do
+#     log_action "Disabling service $service"
+#     execute_chroot "systemctl disable $service"
+#   done
+
+#   log_action "Switching from iptables-nft to iptables-legacy"
+#   execute_chroot "update-alternatives --set iptables /usr/sbin/iptables-legacy" 0
+#   execute_chroot "update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy" 0
+#   log_status 0
+
+#   log_action "Disabling root password"
+#   execute_chroot "passwd -d root"
 
   execute "umount ${DEV_NBD}"
   execute "chmod 777 ${BASE_ROOTFS}"

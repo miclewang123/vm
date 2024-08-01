@@ -3,10 +3,14 @@
 DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/function.sh
 
-echo "destroy images begin ..."
+# remove_vm_img
+remove_vm_img()
+{
+  return
+}
 
-##### check run condition #########
-
-
-
-echo "destroy images end."
+# remove_vpn_img
+remove_vpn_img()
+{
+  return
+}

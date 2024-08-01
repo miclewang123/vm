@@ -6,6 +6,7 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 # remove_files
 remove_files()
 {
+  return
   # read -p "remove base image file [y/n]?" continue
   # if [[ $continue == 'y' || $continue == 'Y' ]]; then
     # execute "rm -rf ${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
