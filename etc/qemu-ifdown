@@ -1,0 +1,3 @@
+#!/bin/sh
+sudo ifconfig $1 down
+sudo brctl delif br0 $1

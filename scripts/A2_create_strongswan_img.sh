@@ -63,6 +63,9 @@ create_img_from_parent()
 
   execute "cp /etc/resolv.conf $DIR_MNT/etc/resolv.conf"
 
+  execute "cp $DIR/etc/fstab $DIR_MNT/etc/"
+  #execute "echo /dev/vda  /  ext4  defaults,relatime,barrier=1 0 1 > $DIR_MNT/etc/fstab"
+
   execute "install_strongswan_env"
 
   execute "umount $DIR_MNT/proc"

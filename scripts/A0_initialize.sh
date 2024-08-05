@@ -39,10 +39,12 @@ remove_files()
 #create_folder
 create_folder()
 {
-  [ ! -d  "${DIR}/rootfs/qcow2" ] || mkdir -p "${DIR}/rootfs/qcow2"
-  [ ! -d  "${DIR}/loop" ] || mkdir -p "${DIR}/loop"
-  [ ! -d  "${DIR}/log" ] || mkdir -p "${DIR}/log"
-  [ ! -d  "${DIR}/vms" ] || mkdir -p "${DIR}/vms"
+  [ -d  "${DIR}/rootfs/qcow2" ] || mkdir -p "${DIR}/rootfs/qcow2"
+  [ -d  "${DIR}/loop" ] || mkdir -p "${DIR}/loop"
+  [ -d  "${DIR}/log" ] || mkdir -p "${DIR}/log"
+  [ -d  "${DIR}/vms" ] || mkdir -p "${DIR}/vms"
+  [ -d  "${DIR}/hostshare" ] || mkdir -p "${DIR}/hostshare"
+  [ -L  "/var/run/hostshare" ] || ln -fs "${DIR}/hostshare" /var/run/hostshare
 
-  chmod -R +222 *
+  #chmod -R +222 *
 }

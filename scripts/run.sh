@@ -10,46 +10,67 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/B2_config.sh
 . $DIR_SCRIPTS/B3_test.sh
 . $DIR_SCRIPTS/B4_remove_config.sh
-. $DIR_SCRIPTS/B5_destroy_img.sh
+. $DIR_SCRIPTS/B5_remove_img.sh
 
-############ define step #####################
-export INITIALIZE="no"
+############ define step ######################################
+if [ 1 -eq 1 ]; then
+  export INITIALIZE="no"
 
-export BUILD_BASE="no"
-export BUILD_STRONGSWAN="no"
+  export BUILD_BASE="no"
+  export BUILD_STRONGSWAN="no"
 
-export INSTALL_STRONGSWAN="no"
+  export INSTALL_STRONGSWAN="no"
 
-export BUILD_VM="no"
-export BUILD_VPN="no"
+  export BUILD_VM="yes"
+  export BUILD_VPN="yes"
 
-export CONFIG_NET="yes"
-export RUN_TEST="yes"
+# export BUILD_CERTS="no"
+# export CONFIG_NET="yes"
+  export RUN_TEST="yes"
 
-export DESTROY_VM_VPN="no"
-##############################################
+  export DESTROY_VM_VPN="no"
+else
+  export INITIALIZE="yes"
 
+  export BUILD_BASE="yes"
+  export BUILD_STRONGSWAN="yes"
+
+  export INSTALL_STRONGSWAN="yes"
+
+  export BUILD_VM="yes"
+  export BUILD_VPN="yes"
+
+# export BUILD_CERTS="yes"
+# export CONFIG_NET="yes"
+  export RUN_TEST="yes"
+
+  export DESTROY_VM_VPN="no"
+fi
+
+###############################################################
 export TEST_DATE="$(date +%Y%m%d%H%M%S)"
 export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
 
-##### check run condition #########
+##################### check run condition #####################
+echo_ok "begin ...\n"
+
 [ `id -u` -eq 0 ] || die "You must be root to run $0"
 
 VMS=`virsh list --name`
 if [ -n "$VMS" ]; then
-  read -p "Vms ($VMS) is running, close them first [y/n]?" continue
-  if [[ $continue == 'y' || $continue == 'Y' ]]; then
+#  read -p "Vms ($VMS) is running, close them first [y/n]?" continue
+#  if [[ $continue == 'y' || $continue == 'Y' ]]; then
     for VM in $VMS
     do
       execute "virsh destroy $VM"
     done
-  else
-    die "Please stop vms ($VMS) before continue $0"
-  fi
+#  else
+#    die "Please stop vms ($VMS) before continue $0"
+#  fi
 fi
 
-echo_ok "begin ...\n"
-# A0
+###############################################################
+# A0 initialize
 if [ $INITIALIZE = "yes" ];	then
   echo_ok "initialize begin ..."
   remove_files
@@ -57,7 +78,8 @@ if [ $INITIALIZE = "yes" ];	then
   echo_ok "initialize end.\n"
 fi
 
-# A1 generate file rootfs_debian_amd64.qcow2
+###############################################################
+# A1 generate os base image
 if [ $BUILD_BASE = "yes" ];	then
   echo_ok "create os images begin ..."
 	create_base_os amd64 debian
@@ -71,13 +93,15 @@ if [ $BUILD_STRONGSWAN = "yes" ];	then
   echo_ok "create strongswan image end.\n"
 fi
 
+###############################################################
+# A3 install strongswan
 if [ $INSTALL_STRONGSWAN = "yes" ];	then
-  # A3 install strongswan
   echo_ok "install strongswan begin ..."
   install_strongswan
   echo_ok "install strongswan end.\n"
 fi
 
+###############################################################
 # B1 create vpn and vm
 if [ $BUILD_VM = "yes" ];	then
   echo_ok "create vm begin ..."
@@ -92,28 +116,34 @@ if [ $BUILD_VPN = "yes" ];	then
 fi
 
 ###############################################################
-if [ $CONFIG_NET = "yes" ];	then
+if [ $RUN_TEST = "yes" ];	then
   # B2 config
   echo_ok "config network and certs begin ..."
-  config_vm_network
-  config_vpn_network
-  config_host_network
+  config_host_network 1 "192.168.0.100" "255.255.255.0"
+  config_host_network 2 "10.1.0.10" "255.255.255.0"
+  config_host_network 3 "10.2.0.10" "255.255.255.0"
   echo_ok "config network and certs end.\n"
-fi
 
-if [ $RUN_TEST = "yes" ];	then
+  # B3 test
   echo_ok "test begin ..."
   start_test 
   stop_test 
   echo_ok "test end.\n"
-fi
-###############################################################
 
+  # B4 remove config
+  echo_ok "remove config begin ..."
+  remove_network
+  echo_ok "remove config end"
+fi
+
+###############################################################
+# B5 remove images
 if [ $DESTROY_VM_VPN = "yes" ];	then
-  echo_ok "destroy images begin ..."
+  echo_ok "remove images begin ..."
   remove_vm_img
   remove_vpn_img
-  echo_ok "destroy images end.\n"
+  echo_ok "remove images end.\n"
 fi
 
+###############################################################
 echo_ok "end."

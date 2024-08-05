@@ -2,22 +2,22 @@
 
 1. remove old files and create folder;
 
-======================== A1. make base OS image =============================
+======================== A1. create base OS image =============================
 
 1. call create_os.sh only one time, to create os image of echo release version;
 
-======================== A2. make strongswan image ==========================
+======================== A2. create strongswan image ==========================
 
 1. base on the os image above, call create_strongswan.sh to create increase image, 
    and install strongswan and runtime env in this image;
 
-======================== A3. install strongswan env =========================
-1. install strongswan env；
+======================== A3. install strongswan  =========================
+1. install strongswan；
 
 =============================================================================
 =============================================================================
 
-======================== B1. make vm and vpn image ==========================
+======================== B1. create vm and vpn image ==========================
 
 1. read vm or vpn information from file test.conf
 
@@ -39,12 +39,14 @@
 
 4. connect each network segment of each vm;
 
-======================== B3. start test =====================================
+======================== B3. test =====================================
 
 1. run test case (include start/stop strongswan etc) and log the test result in test.txt;
 
 2. compare test.txt to the right test result test_right.txt automatically, 
    if no change, test pass, else no pass;
+
+3. stop test;
 
 ======================== B4. remove config ==================================
 
@@ -52,10 +54,11 @@
 
 2. remove iptable and rules setting;
 
-======================== B5. destroy vm and vpn images ======================
+3. stop vm and vpn OS;
 
-1. stop vm and vpn OS;
-2. destroy vm and vpn images;
+======================== B5. remove vm and vpn images ======================
+
+1. remove vm and vpn images;
 
 =============================================================================
 =============================================================================
@@ -70,3 +73,5 @@ B is test；
   2. B3 can be run multiple times;
   3. B4 is need to be run when certs or iptables、rules is modified;
   4. B5 is called when this test environment is no needed;
+
+=============================================================================

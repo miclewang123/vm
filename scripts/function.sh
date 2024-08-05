@@ -22,7 +22,7 @@ export DIR_TPL=${DIR}/tpl
 export TERM=xterm
 export MAC_ID=0
 export VNC_PORT=5901
-export VM_UUID="1f35c25d-6a7b-4ee1-2461-d7e50000"
+export VM_UUID_NO=0
 export IMG_EXT="qcow2"
 
 RED=$(tput setaf 1)

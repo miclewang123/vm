@@ -11,7 +11,8 @@ MAC_ADDR=""
 get_mac_address()
 {
   MAC_ID=$(expr ${MAC_ID} + 1)
-  MAC_ADDR="52:54:00:71:${MAC_ID}:${MAC_ID}"
+  printf -v PAD_ID "%04d" "$MAC_ID"
+  MAC_ADDR="52:54:00:71:${PAD_ID:0:2}:${PAD_ID:2:2}"
 }
 
 # get_vnc_port
@@ -19,6 +20,16 @@ get_mac_address()
 get_vnc_port()
 {
   VNC_PORT=$(expr ${VNC_PORT} + 1)
+}
+
+# get_uuid
+# no params
+VM_UUID=""
+get_uuid()
+{
+  VM_UUID_NO=$(expr ${VM_UUID_NO} + 1)
+  printf -v PAD_ID "%04d" "$VM_UUID_NO"
+  VM_UUID="1f35c25d-6a7b-4ee1-2461-d7e51111${PAD_ID}"
 }
 
 # move_xml_to_vms
@@ -41,6 +52,10 @@ move_xml_to_vms()
 # $7 - QEMU_APP: qemu app name
 # $8 - VNC: vnc port
 # $9 - VM_UUID: vm UUID
+# $10 - NET_MAC1: 
+# $11 - NET_NO1: 
+# $12 - NET_MAC2: 
+# $13 - NET_NO2: 
 create_vm_xml()
 {
   FILE_TPL="${DIR_TPL}/create_vm.tpl"
@@ -56,6 +71,11 @@ create_vm_xml()
   file_searchandreplace %QEMU_APP%     $7 $FILE_TPL_BAK
   file_searchandreplace %VNC%          $8 $FILE_TPL_BAK
   file_searchandreplace %VM_UUID%      $9 $FILE_TPL_BAK
+
+  file_searchandreplace %NET_MAC1%       $10 $FILE_TPL_BAK
+  file_searchandreplace %NET_NAME1%      $11 $FILE_TPL_BAK
+  file_searchandreplace %NET_MAC2%       $12 $FILE_TPL_BAK
+  file_searchandreplace %NET_NAME2%      $13 $FILE_TPL_BAK
 }
 
 # create_vm
@@ -65,6 +85,7 @@ create_vm_xml()
 # $4 - bridge_no: local net bridge no
 # $5 - ip address: local net ip
 # $6 - gw address: local net gateway
+# $7 - network no
 create_vm()
 {
   PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}" 
@@ -73,16 +94,20 @@ create_vm()
   NEW_IMG="${DIR}/rootfs/qcow2/lan$4/rootfs_vm_$1.${IMG_EXT}"
   create_img_from_parent ${NEW_IMG} ${PARENT_IMG}
 
-  IMAGE="${DIR}/boot_image/bzImage_amd64_virtio"
+  IMAGE="${DIR}/boot_image/bzImage_amd64_virtio_9p"
+  #IMAGE="${DIR}/boot_image/bzImage6-3"
   IMAGE=${IMAGE//\//\\\/}
 
   ROOT_FS=$NEW_IMG
   ROOT_FS=${ROOT_FS//\//\\\/}
   
   get_mac_address
+  NET_MAC1=$MAC_ADDR
+  NET_NAME1="vnet$7"
   get_vnc_port
+  get_uuid
 
-  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID}${VNC_PORT}
+  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID} $NET_MAC1 $NET_NAME1
   move_xml_to_vms ${DIR}/vms/lan$4/$1
 }
 
@@ -93,6 +118,8 @@ create_vm()
 # $4 - bridge_no: external net bridge no
 # $5 - ip address: external net ip 
 # $6 - gw address: external net gateway
+# $7 - network1 no
+# $8 - network2 no
 create_vpn()
 {
   PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}" 
@@ -101,17 +128,37 @@ create_vpn()
   NEW_IMG="${DIR}/rootfs/qcow2/vpn/rootfs_vpn_$1.${IMG_EXT}"
   create_img_from_parent ${NEW_IMG} ${PARENT_IMG}
 
-  IMAGE="${DIR}/boot_image/bzImage_amd64_virtio"
+  IMAGE="${DIR}/boot_image/bzImage_amd64_virtio_9p"
+  #IMAGE="${DIR}/boot_image/bzImage6-3"
   IMAGE=${IMAGE//\//\\\/}
 
   ROOT_FS=${NEW_IMG}
   ROOT_FS=${ROOT_FS//\//\\\/}
   
   get_mac_address
-  get_vnc_port
+  NET_MAC1=$MAC_ADDR
+  NET_NAME1="vnet$7"
+  get_mac_address
+  NET_MAC2=$MAC_ADDR
+  NET_NAME2="vnet$8"
 
-  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID}${VNC_PORT}
+  get_vnc_port
+  get_uuid
+
+  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID} $NET_MAC1 $NET_NAME1 $NET_MAC2 $NET_NAME2
   move_xml_to_vms ${DIR}/vms/vpn/$1
+}
+
+# config_vm_network
+config_vm_network()
+{
+  return
+}
+
+# config_vpn_network
+config_vpn_network()
+{
+  return
 }
 
 # start_vm

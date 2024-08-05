@@ -31,6 +31,29 @@
     <controller type='usb' index='0'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x2'/>
     </controller>
+
+    <filesystem type='mount' accessmode='mapped'>
+      <source dir='/var/run/hostshare'/>
+      <target dir='/hostshare'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
+    </filesystem>
+    
+    <interface type='network'>
+      <mac address='%NET_MAC1%'/>
+      <source network='%NET_NAME1%'/>
+      <target dev='eth0'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+
+    <interface type='network'>
+      <mac address='%NET_MAC2%'/>
+      <source network='%NET_NAME2%'/>
+      <target dev='eth1'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+    </interface>
+    
     <serial type='pty'>
       <target port='0'/>
     </serial>
@@ -47,6 +70,8 @@
       <model type='cirrus' vram='9216' heads='1'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
     </video>
+
+
     <memballoon model='virtio'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
     </memballoon>

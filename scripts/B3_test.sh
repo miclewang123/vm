@@ -19,5 +19,5 @@ start_test()
 # $1 - test name
 stop_test()
 {  
-  remove_net_config
+  return
 }
