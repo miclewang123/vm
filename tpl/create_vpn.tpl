@@ -1,12 +1,12 @@
 <domain type='kvm'>
-  <name>vm1</name>
-  <uuid>1f35c25d-6a7b-4ee1-2461-d7e511110001</uuid>
-  <memory unit='MiB'>200</memory>
-  <currentMemory unit='MiB'>200</currentMemory>
-  <vcpu placement='static'>2</vcpu>
+  <name>%NODE_NAME%</name>
+  <uuid>%VM_UUID%</uuid>
+  <memory unit='MiB'>%MEMORY%</memory>
+  <currentMemory unit='MiB'>%MEMORY%</currentMemory>
+  <vcpu placement='static'>%VCPU%</vcpu>
   <os>
-    <type arch='x86_64' machine='pc'>hvm</type>
-    <kernel>/home/wangyi/vm/boot_image/bzImage_amd64_virtio_9p</kernel>
+    <type arch='%ARCH%' machine='pc'>hvm</type>
+    <kernel>%BOOT_IMAGE%</kernel>
     <cmdline>root=/dev/vda loglevel=1 console=hvc0 net.ifnames=0</cmdline>
     <boot dev='hd'/>
   </os>
@@ -21,10 +21,10 @@
   <on_reboot>restart</on_reboot>
   <on_crash>restart</on_crash>
   <devices>
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <emulator>/usr/bin/%QEMU_APP%</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='writethrough'/>
-      <source file='/home/wangyi/vm/rootfs/qcow2/lan1/rootfs_vm_vm1.qcow2'/>
+      <source file='%ROOT_FS%'/>
       <target dev='vda' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
     </disk>
@@ -39,17 +39,17 @@
     </filesystem>
     
     <interface type='network'>
-      <mac address='vm10'/>
-      <source network='vm11'/>
-      <target dev='eth0'/>
+      <mac address='%NET_MAC1%'/>
+      <source network='%NET_NAME1%'/>
+      <target dev='veth0'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>
 
     <interface type='network'>
-      <mac address='vm12'/>
-      <source network='vm13'/>
-      <target dev='eth1'/>
+      <mac address='%NET_MAC2%'/>
+      <source network='%NET_NAME2%'/>
+      <target dev='veth1'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
     </interface>
@@ -62,7 +62,7 @@
     </console>
     <input type='tablet' bus='usb'/>
     <input type='mouse' bus='ps2'/>
-    <graphics type='vnc' port='5902' autoport='no'/>
+    <graphics type='vnc' port='%VNC%' autoport='no'/>
     <sound model='ich6'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
     </sound>

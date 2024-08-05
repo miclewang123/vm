@@ -56,18 +56,11 @@ echo_ok "begin ...\n"
 
 [ `id -u` -eq 0 ] || die "You must be root to run $0"
 
-VMS=`virsh list --name`
-if [ -n "$VMS" ]; then
-#  read -p "Vms ($VMS) is running, close them first [y/n]?" continue
-#  if [[ $continue == 'y' || $continue == 'Y' ]]; then
-    for VM in $VMS
-    do
-      execute "virsh destroy $VM"
-    done
-#  else
-#    die "Please stop vms ($VMS) before continue $0"
-#  fi
-fi
+echo "remove_vms:"
+remove_vms
+
+echo "remove_networks:"
+remove_networks
 
 ###############################################################
 # A0 initialize
@@ -105,13 +98,13 @@ fi
 # B1 create vpn and vm
 if [ $BUILD_VM = "yes" ];	then
   echo_ok "create vm begin ..."
-  create_vm "vm1" 200 2 1 
+  create_vm "vm1" 200 2 2 
   echo_ok "create vm end.\n"
 fi
 
 if [ $BUILD_VPN = "yes" ];	then
   echo_ok "create vpn begin ..."
-  create_vpn "vpn1" 200 2 0 
+  create_vpn "vpn1" 200 2 1 2
   echo_ok "create vpn end.\n"
 fi
 
@@ -126,8 +119,8 @@ if [ $RUN_TEST = "yes" ];	then
 
   # B3 test
   echo_ok "test begin ..."
-  start_test 
-  stop_test 
+  # start_test 
+  # stop_test 
   echo_ok "test end.\n"
 
   # B4 remove config

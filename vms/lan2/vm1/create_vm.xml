@@ -1,6 +1,6 @@
 <domain type='kvm'>
-  <name>vpn1</name>
-  <uuid>1f35c25d-6a7b-4ee1-2461-d7e511110002</uuid>
+  <name>vm1</name>
+  <uuid>1f35c25d-6a7b-4ee1-2461-d7e511110001</uuid>
   <memory unit='MiB'>200</memory>
   <currentMemory unit='MiB'>200</currentMemory>
   <vcpu placement='static'>2</vcpu>
@@ -24,7 +24,7 @@
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='writethrough'/>
-      <source file='/home/wangyi/vm/rootfs/qcow2/vpn/rootfs_vpn_vpn1.qcow2'/>
+      <source file='/home/wangyi/vm/rootfs/qcow2/lan2/rootfs_vm_vm1.qcow2'/>
       <target dev='vda' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
     </disk>
@@ -39,8 +39,8 @@
     </filesystem>
     
     <interface type='network'>
-      <mac address='52:54:00:71:00:02'/>
-      <source network='vnet1'/>
+      <mac address='52:54:00:71:00:01'/>
+      <source network='vnet2'/>
       <target dev='tap1'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
@@ -54,7 +54,7 @@
     </console>
     <input type='tablet' bus='usb'/>
     <input type='mouse' bus='ps2'/>
-    <graphics type='vnc' port='5903' autoport='no'/>
+    <graphics type='vnc' port='5902' autoport='no'/>
     <sound model='ich6'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
     </sound>

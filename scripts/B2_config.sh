@@ -5,7 +5,7 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 
 ##### check run condition #########
 # create_net_xml
-# $1 - NET_NAME: net name
+# $1 - NET_NAME: network no
 # $2 - BR_NAME: bridge name
 # $3 - MAC: mac address
 # $4 - IP: ip address
@@ -14,15 +14,15 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 create_net_xml()
 {
   FILE_TPL="${DIR_TPL}/create_net.tpl"
-  FILE_TPL_BAK="${DIR_TPL}/create_net.xml"
-  cp -f ${FILE_TPL} ${FILE_TPL_BAK}
+  FILE_TPL_XML="${DIR}/vms/create_vnet$1.xml"
+  cp -f ${FILE_TPL} ${FILE_TPL_XML}
 
-  file_searchandreplace %NET_NAME%     $1 $FILE_TPL_BAK
-  file_searchandreplace %BR_NAME%      $2 $FILE_TPL_BAK
-  file_searchandreplace %MAC%          $3 $FILE_TPL_BAK
-  file_searchandreplace %IP%           $4 $FILE_TPL_BAK
-  file_searchandreplace %IP_MASK%      $5 $FILE_TPL_BAK
-  file_searchandreplace %NET_UUID%     $6 $FILE_TPL_BAK
+  file_searchandreplace %NET_NAME%     vnet$1 $FILE_TPL_XML
+  file_searchandreplace %BR_NAME%      $2     $FILE_TPL_XML
+  file_searchandreplace %MAC%          $3     $FILE_TPL_XML
+  file_searchandreplace %IP%           $4     $FILE_TPL_XML
+  file_searchandreplace %IP_MASK%      $5     $FILE_TPL_XML
+  file_searchandreplace %NET_UUID%     $6     $FILE_TPL_XML
 }
 
 #config_host_network
@@ -31,7 +31,6 @@ create_net_xml()
 # $3 - ip_mask
 config_host_network()
 {
-  NET_NAME="vnet$1"
   BR_NAME="br$1"
 
   get_mac_address
@@ -43,9 +42,9 @@ config_host_network()
   get_uuid
   NET_UUID=$VM_UUID
 
-  create_net_xml $NET_NAME $BR_NAME $MAC $IP $IP_MASK $NET_UUID
-
-  virsh net-create create_net.xml
+  create_net_xml $1 $BR_NAME $MAC $IP $IP_MASK $NET_UUID
+ 
+  virsh net-create ${DIR}/vms/create_vnet$1.xml
 }
 
 #########################################

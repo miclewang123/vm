@@ -41,19 +41,11 @@
     <interface type='network'>
       <mac address='%NET_MAC1%'/>
       <source network='%NET_NAME1%'/>
-      <target dev='eth0'/>
+      <target dev='tap1'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>
 
-    <interface type='network'>
-      <mac address='%NET_MAC2%'/>
-      <source network='%NET_NAME2%'/>
-      <target dev='eth1'/>
-      <model type='virtio'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
-    </interface>
-    
     <serial type='pty'>
       <target port='0'/>
     </serial>

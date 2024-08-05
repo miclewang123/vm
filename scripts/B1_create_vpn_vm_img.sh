@@ -32,13 +32,13 @@ get_uuid()
   VM_UUID="1f35c25d-6a7b-4ee1-2461-d7e51111${PAD_ID}"
 }
 
-# move_xml_to_vms
+# move_vm_xml_to_vms
 # $1 - path: path of create_vm.xml
-move_xml_to_vms()
+move_vm_xml_to_vms()
 {
   mkdir -p $1
   rm -f $1/create_vm.xml
-  mv ${DIR_TPL}/create_vm.tpl.bak $1/create_vm.xml
+  mv ${DIR_TPL}/create_vm.xml $1/
   execute "chmod 777 $1/create_vm.xml"
 }
 
@@ -56,36 +56,40 @@ move_xml_to_vms()
 # $11 - NET_NO1: 
 # $12 - NET_MAC2: 
 # $13 - NET_NO2: 
+# 
 create_vm_xml()
 {
   FILE_TPL="${DIR_TPL}/create_vm.tpl"
-  FILE_TPL_BAK="${DIR_TPL}/create_vm.tpl.bak"
-  cp -f ${FILE_TPL} ${FILE_TPL_BAK}
+  FILE_TPL_XML="${DIR_TPL}/create_vm.xml"
+  cp -f ${FILE_TPL} ${FILE_TPL_XML}
 
-  file_searchandreplace %NODE_NAME%    $1 $FILE_TPL_BAK
-  file_searchandreplace %ARCH%         $2 $FILE_TPL_BAK
-  file_searchandreplace %MEMORY%       $3 $FILE_TPL_BAK
-  file_searchandreplace %VCPU%         $4 $FILE_TPL_BAK
-  file_searchandreplace %ROOT_FS%      $5 $FILE_TPL_BAK
-  file_searchandreplace %BOOT_IMAGE%   $6 $FILE_TPL_BAK
-  file_searchandreplace %QEMU_APP%     $7 $FILE_TPL_BAK
-  file_searchandreplace %VNC%          $8 $FILE_TPL_BAK
-  file_searchandreplace %VM_UUID%      $9 $FILE_TPL_BAK
+  file_searchandreplace %NODE_NAME%    $1 $FILE_TPL_XML
+  file_searchandreplace %ARCH%         $2 $FILE_TPL_XML
+  file_searchandreplace %MEMORY%       $3 $FILE_TPL_XML
+  file_searchandreplace %VCPU%         $4 $FILE_TPL_XML
+  file_searchandreplace %ROOT_FS%      $5 $FILE_TPL_XML
+  file_searchandreplace %BOOT_IMAGE%   $6 $FILE_TPL_XML
+  file_searchandreplace %QEMU_APP%     $7 $FILE_TPL_XML
+  file_searchandreplace %VNC%          $8 $FILE_TPL_XML
+  file_searchandreplace %VM_UUID%      $9 $FILE_TPL_XML
 
-  file_searchandreplace %NET_MAC1%       $10 $FILE_TPL_BAK
-  file_searchandreplace %NET_NAME1%      $11 $FILE_TPL_BAK
-  file_searchandreplace %NET_MAC2%       $12 $FILE_TPL_BAK
-  file_searchandreplace %NET_NAME2%      $13 $FILE_TPL_BAK
+  file_searchandreplace %NET_MAC1%       ${10} $FILE_TPL_XML
+  file_searchandreplace %NET_NAME1%      ${11} $FILE_TPL_XML
+  if [ ! -z "${12}" ]; then
+    file_searchandreplace %NET_MAC2%      ${12} $FILE_TPL_XML
+    file_searchandreplace %NET_NAME2%     ${13} $FILE_TPL_XML
+  fi
 }
+
+# $4 - bridge_no: local net bridge no
+# $5 - ip address: local net ip
+# $6 - gw address: local net gateway
 
 # create_vm
 # $1 - NODE_NAME: node name
 # $2 - MEMORY(MB): memory
 # $3 - VCPU: cpu count
-# $4 - bridge_no: local net bridge no
-# $5 - ip address: local net ip
-# $6 - gw address: local net gateway
-# $7 - network no
+# $4 - network no
 create_vm()
 {
   PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}" 
@@ -103,23 +107,26 @@ create_vm()
   
   get_mac_address
   NET_MAC1=$MAC_ADDR
-  NET_NAME1="vnet$7"
+  NET_NAME1="vnet$4"
+
   get_vnc_port
   get_uuid
 
-  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID} $NET_MAC1 $NET_NAME1
-  move_xml_to_vms ${DIR}/vms/lan$4/$1
+  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' ${VNC_PORT} ${VM_UUID} ${NET_MAC1} ${NET_NAME1}
+  echo "move: ${DIR}/vms/lan$4/$1"
+  move_vm_xml_to_vms ${DIR}/vms/lan$4/$1
 }
+
+# $4 - bridge_no: external net bridge no
+# $5 - ip address: external net ip 
+# $6 - gw address: external net gateway
 
 # create_vpn
 # $1 - NODE_NAME: node name
 # $2 - MEMORY(MB): memory
 # $3 - VCPU: cpu count
-# $4 - bridge_no: external net bridge no
-# $5 - ip address: external net ip 
-# $6 - gw address: external net gateway
-# $7 - network1 no
-# $8 - network2 no
+# $4 - network1 no
+# $5 - network2 no
 create_vpn()
 {
   PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}" 
@@ -137,33 +144,21 @@ create_vpn()
   
   get_mac_address
   NET_MAC1=$MAC_ADDR
-  NET_NAME1="vnet$7"
+  NET_NAME1="vnet$4"
   get_mac_address
   NET_MAC2=$MAC_ADDR
-  NET_NAME2="vnet$8"
+  NET_NAME2="vnet$5"
 
   get_vnc_port
   get_uuid
 
   create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID} $NET_MAC1 $NET_NAME1 $NET_MAC2 $NET_NAME2
-  move_xml_to_vms ${DIR}/vms/vpn/$1
-}
-
-# config_vm_network
-config_vm_network()
-{
-  return
-}
-
-# config_vpn_network
-config_vpn_network()
-{
-  return
+  move_vm_xml_to_vms ${DIR}/vms/vpn/$1
 }
 
 # start_vm
 # $1 - NODE_NAME: node name
-# $2 - bridge_no: local net bridge no
+# $2 - network_no: local network no
 start_vm()
 {
   VM_PATH="${DIR}/vms/lan$2/$1"
@@ -189,3 +184,15 @@ start_vpn()
     echo_failed "VPN $1 create failed!"
   fi
 }
+
+# # config_vm_network
+# config_vm_network()
+# {
+#   return
+# }
+
+# # config_vpn_network
+# config_vpn_network()
+# {
+#   return
+# }
