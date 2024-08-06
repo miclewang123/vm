@@ -27,15 +27,24 @@ get_vnc_port()
 VM_UUID=""
 get_uuid()
 {
-  VM_UUID_NO=$(expr ${VM_UUID_NO} + 1)
-  printf -v PAD_ID "%04d" "$VM_UUID_NO"
+  VM_UUID_ID=$(expr ${VM_UUID_ID} + 1)
+  printf -v PAD_ID "%04d" "$VM_UUID_ID"
   VM_UUID="1f35c25d-6a7b-4ee1-2461-d7e51111${PAD_ID}"
+}
+
+# get_ipv6_addr
+# no params
+IPV6=""
+get_ipv6_addr()
+{
+  IPV6_ID=$(expr ${IPV6_ID} + 1)
+  printf -v PAD_ID "%04d" "$IPV6_ID"
+  IPV6="${PAD_ID}::10"
 }
 
 # move_vm_vpn_xml_to_vms
 # $1 - vm or vpn
 # $2 - path: dst path of create_vm.xml or create_vpn.xml
-
 move_vm_vpn_xml_to_vms()
 {
   mkdir -p $2
@@ -84,29 +93,76 @@ create_vm_vpn_xml()
   fi
 }
 
-# $4 - bridge_no: local net bridge no
-# $5 - ip address: local net ip
-# $6 - gw address: local net gateway
+# create_interfaces
+# $1 - type: vm or vpn
+# $2 - eth0 ip address
+# $3 - eth0 ip mask
+# $4 - eth0 gw address
+# $5 - eth0 broadcast address
+# $6 - eth1 ip address
+# $7 - eth1 ip mask
+# $8 - eth1 gw address
+# $9 - eth1 broadcast address
+create_interfaces()
+{
+  FILE_TPL="${DIR_TPL}/interfaces_$1.tpl"
+  FILE="${DIR_MNT}/etc/interfaces"
+  cp -f ${FILE_TPL} ${FILE}
+
+  file_searchandreplace %IP_0%            $2    $FILE
+  file_searchandreplace %MASK_0%          $3    $FILE
+  file_searchandreplace %GATEWAY_0%       $4    $FILE
+  file_searchandreplace %BROADCAST_0%     $5    $FILE
+  
+  if [ ! -z "$6" ]; then
+    file_searchandreplace %IP_1%          $6    $FILE
+    file_searchandreplace %MASK_1%        $7    $FILE
+    file_searchandreplace %GATEWAY_1%     $8    $FILE
+    file_searchandreplace %BROADCAST_1%   $9    $FILE
+  fi
+}
 
 # create_vm
 # $1 - NODE_NAME: node name
 # $2 - MEMORY(MB): memory
 # $3 - VCPU: cpu count
 # $4 - network no
+# $5 - eth0 ip address
+# $6 - eth0 ip mask
+# $7 - eth0 gw address
+# $8 - eth0 broadcast address
 create_vm()
 {
   PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}" 
   [ -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
 
-  NEW_IMG="${DIR}/rootfs/qcow2/lan$4/rootfs_vm_$1.${IMG_EXT}"
-  create_img_from_parent ${NEW_IMG} ${PARENT_IMG}
+  VM_IMG="${DIR}/rootfs/qcow2/lan$4/rootfs_vm_$1.${IMG_EXT}"
+  create_img_from_parent ${VM_IMG} ${PARENT_IMG}
 
+  # install
+  DEV_NBD="/dev/nbd0"
+  load_qemu_nbd
+
+  execute "qemu-nbd -c $DEV_NBD ${VM_IMG}"
+  NBD_PARTITION=${DEV_NBD}
+  execute "mount $NBD_PARTITION $DIR_MNT"
+  #execute "mount -t proc none $DIR_MNT/proc"
+
+  #execute "install ..."
+  echo $1 > $DIR_MNT/etc/hostname 
+
+  create_interfaces "vm" $5 $6 $7 $8
+
+  #execute "umount $DIR_MNT/proc"
+  execute "umount $DIR_MNT"
+  execute "qemu-nbd -d $DEV_NBD"
+
+  #
   IMAGE="${DIR}/boot_image/bzImage_amd64_virtio_9p"
   #IMAGE="${DIR}/boot_image/bzImage6-3"
   IMAGE=${IMAGE//\//\\\/}
 
-  ROOT_FS=$NEW_IMG
-  ROOT_FS=${ROOT_FS//\//\\\/}
+  ROOT_FS=${VM_IMG//\//\\\/}
   
   get_mac_address
   NET_MAC1=$MAC_ADDR
@@ -119,30 +175,51 @@ create_vm()
   move_vm_vpn_xml_to_vms "vm" ${DIR}/vms/lan$4/$1
 }
 
-# $4 - bridge_no: external net bridge no
-# $5 - ip address: external net ip 
-# $6 - gw address: external net gateway
-
 # create_vpn
 # $1 - NODE_NAME: node name
 # $2 - MEMORY(MB): memory
 # $3 - VCPU: cpu count
 # $4 - network1 no
 # $5 - network2 no
+# $6 - eth0 ip address
+# $7 - eth0 ip mask
+# $8 - eth0 gw address
+# $9 - eth0 broadcast address
+# $10- eth1 ip address
+# $11- eth1 ip mask
+# $12- eth1 gw address
+# $13- eth1 broadcast address
 create_vpn()
 {
   PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}" 
   [ -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
 
-  NEW_IMG="${DIR}/rootfs/qcow2/vpn/rootfs_vpn_$1.${IMG_EXT}"
-  create_img_from_parent ${NEW_IMG} ${PARENT_IMG}
+  VM_IMG="${DIR}/rootfs/qcow2/vpn/rootfs_vpn_$1.${IMG_EXT}"
+  create_img_from_parent ${VM_IMG} ${PARENT_IMG}
 
+  # install
+  DEV_NBD="/dev/nbd0"
+  load_qemu_nbd
+
+  execute "qemu-nbd -c $DEV_NBD ${VM_IMG}"
+  NBD_PARTITION=${DEV_NBD}
+  execute "mount $NBD_PARTITION $DIR_MNT"
+  #execute "mount -t proc none $DIR_MNT/proc"
+
+  #execute "install ..."
+  echo $1 > $DIR_MNT/etc/hostname 
+  create_interfaces "vpn" $6 $7 $8 $9 ${10} ${11} ${12} ${13}
+
+  #execute "umount $DIR_MNT/proc"
+  execute "umount $DIR_MNT"
+  execute "qemu-nbd -d $DEV_NBD"
+
+  #
   IMAGE="${DIR}/boot_image/bzImage_amd64_virtio_9p"
   #IMAGE="${DIR}/boot_image/bzImage6-3"
   IMAGE=${IMAGE//\//\\\/}
 
-  ROOT_FS=${NEW_IMG}
-  ROOT_FS=${ROOT_FS//\//\\\/}
+  ROOT_FS=${VM_IMG//\//\\\/}
   
   get_mac_address
   NET_MAC1=$MAC_ADDR
@@ -186,15 +263,3 @@ start_vpn()
     echo_failed "VPN $1 create failed!"
   fi
 }
-
-# # config_vm_network
-# config_vm_network()
-# {
-#   return
-# }
-
-# # config_vpn_network
-# config_vpn_network()
-# {
-#   return
-# }

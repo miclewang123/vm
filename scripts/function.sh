@@ -22,8 +22,9 @@ export DIR_TPL=${DIR}/tpl
 export TERM=xterm
 export MAC_ID=0
 export VNC_PORT=5901
-export VM_UUID_NO=0
+export VM_UUID_ID=0
 export IMG_EXT="qcow2"
+export IPV6_ID=0
 
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)

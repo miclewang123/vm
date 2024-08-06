@@ -18,13 +18,5 @@ export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
 
 ##################### check run condition #####################
 echo_ok "stop begin ...\n"
-
-[ `id -u` -eq 0 ] || die "You must be root to run $0"
-
-echo "remove_vms:"
-remove_vms
-
-echo "remove_networks:"
-remove_networks
-
+stop_test
 echo_ok "stop end."

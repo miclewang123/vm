@@ -66,8 +66,6 @@ create_img_from_parent()
   execute "cp $DIR/etc/fstab $DIR_MNT/etc/"
   #execute "echo /dev/vda  /  ext4  defaults,relatime,barrier=1 0 1 > $DIR_MNT/etc/fstab"
 
-  execute "install_strongswan_env"
-
   execute "umount $DIR_MNT/proc"
   execute "umount $DIR_MNT"
   
@@ -82,6 +80,22 @@ create_strongswan_img()
 
   execute "rm -rf ${STRONGSWAN_IMG}"
   create_img_from_parent ${STRONGSWAN_IMG} ${PARENT_IMG}
+
+  # install
+  DEV_NBD="/dev/nbd0"
+  load_qemu_nbd
+  execute "qemu-nbd -c $DEV_NBD ${STRONGSWAN_IMG}"
+
+  NBD_PARTITION=${DEV_NBD}
+  execute "mount $NBD_PARTITION $DIR_MNT"
+  execute "mount -t proc none $DIR_MNT/proc"
+
+  execute "install_strongswan_env"
+
+  execute "umount $DIR_MNT/proc"
+  execute "umount $DIR_MNT"
+  
+  execute "qemu-nbd -d $DEV_NBD"
 }
 
   # mkdir -p $SHARED_DIR

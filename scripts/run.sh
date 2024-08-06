@@ -27,7 +27,7 @@ if [ 1 -eq 1 ]; then
 # export BUILD_CERTS="no"
 # export CONFIG_NET="yes"
   export RUN_TEST="yes"
-  export REMOVE_CONFIG="no"
+  export STOP_TEST="no"
   export DESTROY_VM_VPN="no"
 else
   export INITIALIZE="yes"
@@ -44,7 +44,7 @@ else
 # export CONFIG_NET="yes"
   export RUN_TEST="yes"
 
-  export REMOVE_CONFIG="no"
+  export STOP_TEST="no"
   export DESTROY_VM_VPN="no"
 fi
 
@@ -100,13 +100,36 @@ fi
 # B1 create vpn and vm
 if [ $BUILD_VM = "yes" ];	then
   echo_ok "create vm begin ..."
-  create_vm "vm1" 200 2 2 
+
+  # $1 - NODE_NAME: node name
+  # $2 - MEMORY(MB): memory
+  # $3 - VCPU: cpu count
+  # $4 - network no
+  # $5 - eth0 ip address
+  # $6 - eth0 ip mask
+  # $7 - eth0 gw address
+  # $8 - eth0 broadcast address
+  create_vm "vm1" 200 2 2 "10.2.0.10"  "255.255.255.0" "10.2.0.1" "10.2.255.255"
   echo_ok "create vm end.\n"
 fi
 
 if [ $BUILD_VPN = "yes" ];	then
   echo_ok "create vpn begin ..."
-  create_vpn "vpn1" 200 2 1 2
+
+  # $1 - NODE_NAME: node name
+  # $2 - MEMORY(MB): memory
+  # $3 - VCPU: cpu count
+  # $4 - network1 no
+  # $5 - network2 no
+  # $6 - eth0 ip address
+  # $7 - eth0 ip mask
+  # $8 - eth0 gw address
+  # $9 - eth0 broadcast address
+  # $10- eth1 ip address
+  # $11- eth1 ip mask
+  # $12- eth1 gw address
+  # $13- eth1 broadcast address
+  create_vpn "vpn1" 200 2 1 2      "10.2.0.11"  "255.255.255.0" "10.2.0.1" "10.2.255.255"     "192.168.0.10"  "255.255.255.0" "192.168.0.1" "192.168.255.255"
   echo_ok "create vpn end.\n"
 fi
 
@@ -115,24 +138,23 @@ if [ $RUN_TEST = "yes" ];	then
   # B2 config
   echo_ok "config network and certs begin ..."
   config_host_network 1 "192.168.0.100" "255.255.255.0"
-  config_host_network 2 "10.1.0.10" "255.255.255.0"
-  config_host_network 3 "10.2.0.10" "255.255.255.0"
+  config_host_network 2 "10.2.0.100" "255.255.255.0"
+  config_host_network 3 "10.3.0.100" "255.255.255.0"
   echo_ok "config network and certs end.\n"
 
   # B3 test
   echo_ok "test begin ..."
   start_test 
-  stop_test 
   echo_ok "test end.\n"
 fi
 
 ###############################################################
 # B4 remove images
-if [ $REMOVE_CONFIG = "yes" ];	then
+if [ $STOP_TEST = "yes" ];	then
   # B4 remove config
-  echo_ok "remove config begin ..."
-  remove_networks
-  echo_ok "remove config end"
+  echo_ok "stop test begin ..."
+  stop_test 
+  echo_ok "stop test end"
 fi
 
 ###############################################################

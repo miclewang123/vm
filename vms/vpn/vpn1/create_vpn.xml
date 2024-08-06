@@ -41,7 +41,7 @@
     <interface type='network'>
       <mac address='52:54:00:71:00:02'/>
       <source network='vnet1'/>
-      <target dev='vpn1_eth0'/>
+      <target dev='vpn1_tap0'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>
@@ -49,7 +49,7 @@
     <interface type='network'>
       <mac address='52:54:00:71:00:03'/>
       <source network='vnet2'/>
-      <target dev='vpn1_eth1'/>
+      <target dev='vpn1_tap1'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
     </interface>

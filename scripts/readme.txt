@@ -74,4 +74,9 @@ B is test；
   3. B4 is need to be run when certs or iptables、rules is modified;
   4. B5 is called when this test environment is no needed;
 
+========================= user call =========================================
+
+run.sh  -  run test in steps
+stop.sh -  stop test vm and vpn, remove net config
+
 =============================================================================
