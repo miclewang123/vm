@@ -1,6 +1,6 @@
 <domain type='kvm'>
   <name>vm1</name>
-  <uuid>vm0</uuid>
+  <uuid>1f35c25d-6a7b-4ee1-2461-d7e511110001</uuid>
   <memory unit='MiB'>200</memory>
   <currentMemory unit='MiB'>200</currentMemory>
   <vcpu placement='static'>2</vcpu>

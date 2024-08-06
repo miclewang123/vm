@@ -32,11 +32,11 @@ get_uuid()
   VM_UUID="1f35c25d-6a7b-4ee1-2461-d7e51111${PAD_ID}"
 }
 
-# move_vm_xml_to_vms
+# move_vm_vpn_xml_to_vms
 # $1 - vm or vpn
 # $2 - path: dst path of create_vm.xml or create_vpn.xml
 
-move_xml_to_vms()
+move_vm_vpn_xml_to_vms()
 {
   mkdir -p $2
   rm -f $1/create_$1.xml
@@ -66,21 +66,21 @@ create_vm_vpn_xml()
   FILE_TPL_XML="${DIR_TPL}/create_$1.xml"
   cp -f ${FILE_TPL} ${FILE_TPL_XML}
 
-  file_searchandreplace %NODE_NAME%    $2 $FILE_TPL_XML
-  file_searchandreplace %ARCH%         $3 $FILE_TPL_XML
-  file_searchandreplace %MEMORY%       $4 $FILE_TPL_XML
-  file_searchandreplace %VCPU%         $5 $FILE_TPL_XML
-  file_searchandreplace %ROOT_FS%      $6 $FILE_TPL_XML
-  file_searchandreplace %BOOT_IMAGE%   $7 $FILE_TPL_XML
-  file_searchandreplace %QEMU_APP%     $8 $FILE_TPL_XML
-  file_searchandreplace %VNC%          $9 $FILE_TPL_XML
-  file_searchandreplace %VM_UUID%      $10 $FILE_TPL_XML
+  file_searchandreplace %NODE_NAME%     $2    $FILE_TPL_XML
+  file_searchandreplace %ARCH%          $3    $FILE_TPL_XML
+  file_searchandreplace %MEMORY%        $4    $FILE_TPL_XML
+  file_searchandreplace %VCPU%          $5    $FILE_TPL_XML
+  file_searchandreplace %ROOT_FS%       $6    $FILE_TPL_XML
+  file_searchandreplace %BOOT_IMAGE%    $7    $FILE_TPL_XML
+  file_searchandreplace %QEMU_APP%      $8    $FILE_TPL_XML
+  file_searchandreplace %VNC%           $9    $FILE_TPL_XML
+  file_searchandreplace %VM_UUID%       ${10} $FILE_TPL_XML
 
-  file_searchandreplace %NET_MAC1%       ${11} $FILE_TPL_XML
-  file_searchandreplace %NET_NAME1%      ${12} $FILE_TPL_XML
+  file_searchandreplace %NET_MAC1%      ${11} $FILE_TPL_XML
+  file_searchandreplace %NET_NAME1%     ${12} $FILE_TPL_XML
   if [ ! -z "${13}" ]; then
-    file_searchandreplace %NET_MAC2%      ${13} $FILE_TPL_XML
-    file_searchandreplace %NET_NAME2%     ${14} $FILE_TPL_XML
+    file_searchandreplace %NET_MAC2%    ${13} $FILE_TPL_XML
+    file_searchandreplace %NET_NAME2%   ${14} $FILE_TPL_XML
   fi
 }
 
@@ -116,7 +116,7 @@ create_vm()
   get_uuid
 
   create_vm_vpn_xml "vm" $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' ${VNC_PORT} ${VM_UUID} ${NET_MAC1} ${NET_NAME1}
-  move_xml_to_vms "vm" ${DIR}/vms/lan$4/$1
+  move_vm_vpn_xml_to_vms "vm" ${DIR}/vms/lan$4/$1
 }
 
 # $4 - bridge_no: external net bridge no
@@ -155,7 +155,7 @@ create_vpn()
   get_uuid
 
   create_vm_vpn_xml "vpn" $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID} $NET_MAC1 $NET_NAME1 $NET_MAC2 $NET_NAME2
-  move_xml_to_vms "vpn" ${DIR}/vms/vpn/$1
+  move_vm_vpn_xml_to_vms "vpn" ${DIR}/vms/vpn/$1
 }
 
 # start_vm

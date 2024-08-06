@@ -41,7 +41,7 @@
     <interface type='network'>
       <mac address='%NET_MAC1%'/>
       <source network='%NET_NAME1%'/>
-      <target dev='%NODE_NAME%_eth0'/>
+      <target dev='%NODE_NAME%_tap0'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>

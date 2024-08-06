@@ -27,7 +27,7 @@ if [ 1 -eq 1 ]; then
 # export BUILD_CERTS="no"
 # export CONFIG_NET="yes"
   export RUN_TEST="yes"
-
+  export REMOVE_CONFIG="no"
   export DESTROY_VM_VPN="no"
 else
   export INITIALIZE="yes"
@@ -44,15 +44,17 @@ else
 # export CONFIG_NET="yes"
   export RUN_TEST="yes"
 
+  export REMOVE_CONFIG="no"
   export DESTROY_VM_VPN="no"
 fi
 
 ###############################################################
-export TEST_DATE="$(date +%Y%m%d%H%M%S)"
+#export TEST_DATE="$(date +%Y%m%d%H%M%S)"
+export TEST_DATE="$(date +%Y%m%d)"
 export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
 
 ##################### check run condition #####################
-echo_ok "begin ...\n"
+echo_ok "run begin ...\n"
 
 [ `id -u` -eq 0 ] || die "You must be root to run $0"
 
@@ -119,10 +121,14 @@ if [ $RUN_TEST = "yes" ];	then
 
   # B3 test
   echo_ok "test begin ..."
-  # start_test 
-  # stop_test 
+  start_test 
+  stop_test 
   echo_ok "test end.\n"
+fi
 
+###############################################################
+# B4 remove images
+if [ $REMOVE_CONFIG = "yes" ];	then
   # B4 remove config
   echo_ok "remove config begin ..."
   remove_networks
@@ -139,4 +145,4 @@ if [ $DESTROY_VM_VPN = "yes" ];	then
 fi
 
 ###############################################################
-echo_ok "end."
+echo_ok "run end."
