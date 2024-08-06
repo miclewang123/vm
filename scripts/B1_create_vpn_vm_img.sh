@@ -33,51 +33,54 @@ get_uuid()
 }
 
 # move_vm_xml_to_vms
-# $1 - path: path of create_vm.xml
-move_vm_xml_to_vms()
+# $1 - vm or vpn
+# $2 - path: dst path of create_vm.xml or create_vpn.xml
+
+move_xml_to_vms()
 {
-  mkdir -p $1
-  rm -f $1/create_vm.xml
-  mv ${DIR_TPL}/create_vm.xml $1/
-  execute "chmod 777 $1/create_vm.xml"
+  mkdir -p $2
+  rm -f $1/create_$1.xml
+  mv ${DIR_TPL}/create_$1.xml $2/
+  execute "chmod 777 $2/create_$1.xml"
 }
 
-# create_vm_xml
-# $1 - NODE_NAME: node name
-# $2 - ARCH: x86_64 or aarch64
-# $3 - MEMORY(MB): memory
-# $4 - VCPU: cpu count
-# $5 - ROOT_FS: root file system
-# $6 - BOOT_IMAGE: boot image
-# $7 - QEMU_APP: qemu app name
-# $8 - VNC: vnc port
-# $9 - VM_UUID: vm UUID
-# $10 - NET_MAC1: 
-# $11 - NET_NO1: 
-# $12 - NET_MAC2: 
-# $13 - NET_NO2: 
+# create_vm_vpn_xml
+# $1 - type: vm or vpn
+# $2 - NODE_NAME: node name
+# $3 - ARCH: x86_64 or aarch64
+# $4 - MEMORY(MB): memory
+# $5 - VCPU: cpu count
+# $6 - ROOT_FS: root file system
+# $7 - BOOT_IMAGE: boot image
+# $8 - QEMU_APP: qemu app name
+# $9 - VNC: vnc port
+# $10 - VM_UUID: vm UUID
+# $11 - NET_MAC1: 
+# $12 - NET_NO1: 
+# $13 - NET_MAC2: 
+# $14 - NET_NO2: 
 # 
-create_vm_xml()
+create_vm_vpn_xml()
 {
-  FILE_TPL="${DIR_TPL}/create_vm.tpl"
-  FILE_TPL_XML="${DIR_TPL}/create_vm.xml"
+  FILE_TPL="${DIR_TPL}/create_$1.tpl"
+  FILE_TPL_XML="${DIR_TPL}/create_$1.xml"
   cp -f ${FILE_TPL} ${FILE_TPL_XML}
 
-  file_searchandreplace %NODE_NAME%    $1 $FILE_TPL_XML
-  file_searchandreplace %ARCH%         $2 $FILE_TPL_XML
-  file_searchandreplace %MEMORY%       $3 $FILE_TPL_XML
-  file_searchandreplace %VCPU%         $4 $FILE_TPL_XML
-  file_searchandreplace %ROOT_FS%      $5 $FILE_TPL_XML
-  file_searchandreplace %BOOT_IMAGE%   $6 $FILE_TPL_XML
-  file_searchandreplace %QEMU_APP%     $7 $FILE_TPL_XML
-  file_searchandreplace %VNC%          $8 $FILE_TPL_XML
-  file_searchandreplace %VM_UUID%      $9 $FILE_TPL_XML
+  file_searchandreplace %NODE_NAME%    $2 $FILE_TPL_XML
+  file_searchandreplace %ARCH%         $3 $FILE_TPL_XML
+  file_searchandreplace %MEMORY%       $4 $FILE_TPL_XML
+  file_searchandreplace %VCPU%         $5 $FILE_TPL_XML
+  file_searchandreplace %ROOT_FS%      $6 $FILE_TPL_XML
+  file_searchandreplace %BOOT_IMAGE%   $7 $FILE_TPL_XML
+  file_searchandreplace %QEMU_APP%     $8 $FILE_TPL_XML
+  file_searchandreplace %VNC%          $9 $FILE_TPL_XML
+  file_searchandreplace %VM_UUID%      $10 $FILE_TPL_XML
 
-  file_searchandreplace %NET_MAC1%       ${10} $FILE_TPL_XML
-  file_searchandreplace %NET_NAME1%      ${11} $FILE_TPL_XML
-  if [ ! -z "${12}" ]; then
-    file_searchandreplace %NET_MAC2%      ${12} $FILE_TPL_XML
-    file_searchandreplace %NET_NAME2%     ${13} $FILE_TPL_XML
+  file_searchandreplace %NET_MAC1%       ${11} $FILE_TPL_XML
+  file_searchandreplace %NET_NAME1%      ${12} $FILE_TPL_XML
+  if [ ! -z "${13}" ]; then
+    file_searchandreplace %NET_MAC2%      ${13} $FILE_TPL_XML
+    file_searchandreplace %NET_NAME2%     ${14} $FILE_TPL_XML
   fi
 }
 
@@ -112,9 +115,8 @@ create_vm()
   get_vnc_port
   get_uuid
 
-  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' ${VNC_PORT} ${VM_UUID} ${NET_MAC1} ${NET_NAME1}
-  echo "move: ${DIR}/vms/lan$4/$1"
-  move_vm_xml_to_vms ${DIR}/vms/lan$4/$1
+  create_vm_vpn_xml "vm" $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' ${VNC_PORT} ${VM_UUID} ${NET_MAC1} ${NET_NAME1}
+  move_xml_to_vms "vm" ${DIR}/vms/lan$4/$1
 }
 
 # $4 - bridge_no: external net bridge no
@@ -152,8 +154,8 @@ create_vpn()
   get_vnc_port
   get_uuid
 
-  create_vm_xml $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID} $NET_MAC1 $NET_NAME1 $NET_MAC2 $NET_NAME2
-  move_vm_xml_to_vms ${DIR}/vms/vpn/$1
+  create_vm_vpn_xml "vpn" $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID} $NET_MAC1 $NET_NAME1 $NET_MAC2 $NET_NAME2
+  move_xml_to_vms "vpn" ${DIR}/vms/vpn/$1
 }
 
 # start_vm
@@ -176,7 +178,7 @@ start_vm()
 start_vpn()
 {
   VM_PATH="${DIR}/vms/vpn/$1"
-  virsh create ${VM_PATH}/create_vm.xml
+  virsh create ${VM_PATH}/create_vpn.xml
 
   if [ $? -eq 0 ]; then
     echo_ok "VPN $1 create OK."

@@ -21,7 +21,6 @@ remove_networks()
   fi
 }
 
-
 # remove_vms
 remove_vms()
 {

@@ -1,6 +1,6 @@
 <domain type='kvm'>
   <name>vm1</name>
-  <uuid>1f35c25d-6a7b-4ee1-2461-d7e511110001</uuid>
+  <uuid>vm0</uuid>
   <memory unit='MiB'>200</memory>
   <currentMemory unit='MiB'>200</currentMemory>
   <vcpu placement='static'>2</vcpu>
@@ -41,7 +41,7 @@
     <interface type='network'>
       <mac address='52:54:00:71:00:01'/>
       <source network='vnet2'/>
-      <target dev='tap1'/>
+      <target dev='vm1_eth0'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>

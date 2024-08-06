@@ -125,7 +125,7 @@ if [ $RUN_TEST = "yes" ];	then
 
   # B4 remove config
   echo_ok "remove config begin ..."
-  remove_network
+  remove_networks
   echo_ok "remove config end"
 fi
 
