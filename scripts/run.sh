@@ -27,6 +27,7 @@ if [ 1 -eq 1 ]; then
 # export BUILD_CERTS="no"
 # export CONFIG_NET="yes"
   export RUN_TEST="yes"
+
   export STOP_TEST="no"
   export DESTROY_VM_VPN="no"
 else
@@ -110,6 +111,8 @@ if [ $BUILD_VM = "yes" ];	then
   # $7 - eth0 gw address
   # $8 - eth0 broadcast address
   create_vm "vm1" 200 2 2 "10.2.0.10"  "255.255.255.0" "10.2.0.1" "10.2.255.255"
+  create_vm "vm2" 200 2 2 "10.2.0.11"  "255.255.255.0" "10.2.0.1" "10.2.255.255"
+
   echo_ok "create vm end.\n"
 fi
 
@@ -119,17 +122,17 @@ if [ $BUILD_VPN = "yes" ];	then
   # $1 - NODE_NAME: node name
   # $2 - MEMORY(MB): memory
   # $3 - VCPU: cpu count
-  # $4 - network1 no
-  # $5 - network2 no
-  # $6 - eth0 ip address
-  # $7 - eth0 ip mask
-  # $8 - eth0 gw address
-  # $9 - eth0 broadcast address
+  # $4 - eth0 network no
+  # $5 - eth0 ip address
+  # $6 - eth0 ip mask
+  # $7 - eth0 gw address
+  # $8 - eth0 broadcast address
+  # $9 - eth1 network no
   # $10- eth1 ip address
   # $11- eth1 ip mask
   # $12- eth1 gw address
   # $13- eth1 broadcast address
-  create_vpn "vpn1" 200 2 1 2      "10.2.0.11"  "255.255.255.0" "10.2.0.1" "10.2.255.255"     "192.168.0.10"  "255.255.255.0" "192.168.0.1" "192.168.255.255"
+  create_vpn "vpn1" 200 2         2 "10.2.0.1"  "255.255.255.0" "10.2.0.2" "10.2.255.255"      1 "192.168.0.10"  "255.255.255.0" "192.168.0.1" "192.168.255.255"
   echo_ok "create vpn end.\n"
 fi
 

@@ -106,7 +106,7 @@ create_vm_vpn_xml()
 create_interfaces()
 {
   FILE_TPL="${DIR_TPL}/interfaces_$1.tpl"
-  FILE="${DIR_MNT}/etc/interfaces"
+  FILE="${DIR_MNT}/etc/network/interfaces"
   cp -f ${FILE_TPL} ${FILE}
 
   file_searchandreplace %IP_0%            $2    $FILE
@@ -179,12 +179,12 @@ create_vm()
 # $1 - NODE_NAME: node name
 # $2 - MEMORY(MB): memory
 # $3 - VCPU: cpu count
-# $4 - network1 no
-# $5 - network2 no
-# $6 - eth0 ip address
-# $7 - eth0 ip mask
-# $8 - eth0 gw address
-# $9 - eth0 broadcast address
+# $4 - eth0 network no
+# $5 - eth0 ip address
+# $6 - eth0 ip mask
+# $7 - eth0 gw address
+# $8 - eth0 broadcast address
+# $9 - eth1 network no
 # $10- eth1 ip address
 # $11- eth1 ip mask
 # $12- eth1 gw address
@@ -208,7 +208,7 @@ create_vpn()
 
   #execute "install ..."
   echo $1 > $DIR_MNT/etc/hostname 
-  create_interfaces "vpn" $6 $7 $8 $9 ${10} ${11} ${12} ${13}
+  create_interfaces "vpn" $5 $6 $7 $8 ${10} ${11} ${12} ${13}
 
   #execute "umount $DIR_MNT/proc"
   execute "umount $DIR_MNT"
@@ -226,7 +226,7 @@ create_vpn()
   NET_NAME1="vnet$4"
   get_mac_address
   NET_MAC2=$MAC_ADDR
-  NET_NAME2="vnet$5"
+  NET_NAME2="vnet$9"
 
   get_vnc_port
   get_uuid

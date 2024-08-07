@@ -30,6 +30,7 @@ create_base_os()
   execute "mkdir -p ${DIR_MNT}"
   execute "mount ${DEV_NBD} ${DIR_MNT}"
   execute "cp -af ${DIR}/rootfs/rootfs_${2}_${1}/* ${DIR_MNT}"
+  execute "cp -af ${DIR}/etc/ssh/sshd_config ${DIR_MNT}/etc/ssh/"
 
 #   # package includes/excludes
 #   INC=automake autoconf libtool bison flex gperf pkg-config gettext less locales
@@ -57,13 +58,6 @@ create_base_os()
 # en_US.UTF-8 UTF-8
 # EOF
 #   execute_chroot "locale-gen"
-
-
-
-
-
-
-
 
 
 #   SERVICES="apache2 dbus isc-dhcp-server slapd bind9 freeradius"

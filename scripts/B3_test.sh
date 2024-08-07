@@ -8,6 +8,7 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 start_test()
 {
   start_vm "vm1" 2
+  start_vm "vm2" 2
   
   start_vpn "vpn1"
 }
