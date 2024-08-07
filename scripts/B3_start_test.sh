@@ -109,8 +109,9 @@ add_network()
   if [ $SLOT -lt 10 ]; then
     SLOT=10
   fi
-  echo "host: $HOST slot: $SLOT tap: $TAP_NO"
-  create_iface_xml $HOST_$TAP_NO $2 $SLOT
+
+  NETWORK_NO=$2
+  create_iface_xml ${HOST}_tap${TAP_NO} ${NETWORK_NO} ${SLOT}
   virsh attach-device $HOST "$DIR_TPL/iface.xml"
 
   NET_IP=$3
@@ -122,7 +123,7 @@ add_network()
 
   get_subnet $NET_IP $NET_MASK_COUNT
 
-  execute "ssh root@$$HOST_IP  ip addr add $NET_IP/$NET_MASK_COUNT dev ${HOST}_tap${TAP_NO}; ip route add ${SUB_NET}/$NET_MASK_COUNT via $NET_GATEWAY dev ${HOST}_tap${TAP_NO}"
+  execute "ssh root@${HOST_IP}  ip addr add $NET_IP/$NET_MASK_COUNT dev ${HOST}_tap${TAP_NO}; ip route add ${SUB_NET}/$NET_MASK_COUNT via $NET_GATEWAY dev ${HOST}_tap${TAP_NO}"
 }
 
 # create_vm_vpn_config
