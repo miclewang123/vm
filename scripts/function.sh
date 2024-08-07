@@ -25,6 +25,7 @@ export VNC_PORT=5901
 export VM_UUID_ID=0
 export IMG_EXT="qcow2"
 export IPV6_ID=0
+export DEV_NBD="/dev/nbd0"
 
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
@@ -43,12 +44,6 @@ die() {
 	echo -e "${RED}$1${NORMAL}"
 	exit 1
 }
-
-##### check run condition #########
-[ `id -u` -eq 0 ] || die "You must be root to run $0"
-[ -d $DIR/log ] || die "log directory not found"
-[ -d $DIR/vms ] || die "vms directory not found"
-
 
 # execute command
 # $1 - command to execute

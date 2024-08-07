@@ -2,8 +2,8 @@
 DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/function.sh
 
-# remove_networks
-remove_networks()
+# destroy_networks
+destroy_networks()
 {
 	VNETS=`virsh net-list --name`
 
@@ -21,8 +21,8 @@ remove_networks()
   fi
 }
 
-# remove_vms
-remove_vms()
+# destroy_vms
+destroy_vms()
 {
   VMS=`virsh list --name`
   if [ -n "$VMS" ]; then
@@ -36,4 +36,20 @@ remove_vms()
   #    die "Please stop vms ($VMS) before continue $0"
   #  fi
   fi
+}
+
+# stop_test
+stop_test()
+{  
+  [ `id -u` -eq 0 ] || die "You must be root to run $0"
+
+  echo "destroy_vms:"
+  destroy_vms
+
+  echo "destroy_networks:"
+  destroy_networks
+
+  umount ${DIR_MNT}/proc
+  umount ${DIR_MNT}
+  execute "qemu-nbd -d ${DEV_NBD}"
 }

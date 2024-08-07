@@ -2,22 +2,22 @@
 
 1. remove old files and create folder;
 
-======================== A1. create base OS image =============================
+======================== A1. create base OS image ===========================
 
 1. call create_os.sh only one time, to create os image of echo release version;
 
-======================== A2. create strongswan image ==========================
+======================== A2. create strongswan image ========================
 
 1. base on the os image above, call create_strongswan.sh to create increase image, 
    and install strongswan and runtime env in this image;
 
-======================== A3. install strongswan  =========================
+======================== A3. install strongswan  ============================
 1. install strongswan；
 
 =============================================================================
 =============================================================================
 
-======================== B1. create vm and vpn image ==========================
+======================== B1. create vm and vpn image ========================
 
 1. read vm or vpn information from file test.conf
 
@@ -29,7 +29,7 @@
 
 4. start vm and vpn OS;
 
-======================== B2. config vm and vpn ==============================
+======================== B2. create vm and vpn config =======================
 
 1. read iptables, rules and set iptables and rules of each vm or vpn;
 
@@ -39,16 +39,14 @@
 
 4. connect each network segment of each vm;
 
-======================== B3. test =====================================
+======================== B3. start test =====================================
 
-1. run test case (include start/stop strongswan etc) and log the test result in test.txt;
+1. run test case (include start/stop strongswan etc) and log the test result in result.txt;
 
-2. compare test.txt to the right test result test_right.txt automatically, 
+2. compare result.txt to the right test result result_right.txt automatically, 
    if no change, test pass, else no pass;
 
-3. stop test;
-
-======================== B4. remove config ==================================
+======================== B4. stop test ======================================
 
 1. remove certs;
 
@@ -56,9 +54,11 @@
 
 3. stop vm and vpn OS;
 
-======================== B5. remove vm and vpn images ======================
+======================== B5. remove vm and vpn config and img ===============
 
 1. remove vm and vpn images;
+
+2. remove vm and vpn config;
 
 =============================================================================
 =============================================================================

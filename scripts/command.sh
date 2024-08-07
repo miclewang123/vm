@@ -18,6 +18,15 @@ export TEST_DATE="$(date +%Y%m%d)"
 export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
 
 ##################### check run condition #####################
-echo_ok "stop begin ...\n"
-stop_test
-echo_ok "stop end."
+echo_ok "command begin ...\n"
+
+create_host_network   4 "10.4.0.100" "255.255.255.0"
+
+create_vm "vm4-1" $MEM_VM $CPU_VM         2 "10.4.0.10"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
+create_vm "vm4-2" $MEM_VM $CPU_VM         2 "10.4.0.11"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
+
+add_network "10.2.0.1"  4 "10.4.0.10"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
+
+# get_subnet 192.168.2.20 16
+# echo $SUB_NET
+echo_ok "command end."

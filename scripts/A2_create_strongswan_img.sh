@@ -48,10 +48,12 @@ create_img_from_parent()
 {
   [ -d ${DIR_MNT} ] ||  mkdir -p ${DIR_MNT}
 
-  DEV_NBD="/dev/nbd0"
   load_qemu_nbd
 
   [ ! -f ${Dir}/rootfs/qcow2/rootfs_strongswan.qcow2 ] || execute "rm -rf ${Dir}/rootfs/qcow2/rootfs_strongswan.qcow2"
+  
+  DIR_NEW_IMG=$(dirname `readlink -f $1`)
+  [ -d ${DIR_NEW_IMG} ] ||  mkdir -p ${DIR_NEW_IMG}
   execute "qemu-img create -b $2 -f $IMG_EXT -F $IMG_EXT $1"
   
   execute "qemu-nbd -c $DEV_NBD $1"
@@ -82,7 +84,6 @@ create_strongswan_img()
   create_img_from_parent ${STRONGSWAN_IMG} ${PARENT_IMG}
 
   # install
-  DEV_NBD="/dev/nbd0"
   load_qemu_nbd
   execute "qemu-nbd -c $DEV_NBD ${STRONGSWAN_IMG}"
 

@@ -68,7 +68,6 @@ move_vm_vpn_xml_to_vms()
 # $12 - NET_NO1: 
 # $13 - NET_MAC2: 
 # $14 - NET_NO2: 
-# 
 create_vm_vpn_xml()
 {
   FILE_TPL="${DIR_TPL}/create_$1.tpl"
@@ -113,12 +112,16 @@ create_interfaces()
   file_searchandreplace %MASK_0%          $3    $FILE
   file_searchandreplace %GATEWAY_0%       $4    $FILE
   file_searchandreplace %BROADCAST_0%     $5    $FILE
-  
+  get_ipv6_addr
+  file_searchandreplace %IPV6_0%          $IPV6 $FILE
+
   if [ ! -z "$6" ]; then
     file_searchandreplace %IP_1%          $6    $FILE
     file_searchandreplace %MASK_1%        $7    $FILE
     file_searchandreplace %GATEWAY_1%     $8    $FILE
     file_searchandreplace %BROADCAST_1%   $9    $FILE
+    get_ipv6_addr
+    file_searchandreplace %IPV6_1%        $IPV6 $FILE
   fi
 }
 
@@ -140,7 +143,6 @@ create_vm()
   create_img_from_parent ${VM_IMG} ${PARENT_IMG}
 
   # install
-  DEV_NBD="/dev/nbd0"
   load_qemu_nbd
 
   execute "qemu-nbd -c $DEV_NBD ${VM_IMG}"
@@ -198,7 +200,6 @@ create_vpn()
   create_img_from_parent ${VM_IMG} ${PARENT_IMG}
 
   # install
-  DEV_NBD="/dev/nbd0"
   load_qemu_nbd
 
   execute "qemu-nbd -c $DEV_NBD ${VM_IMG}"
@@ -235,31 +236,3 @@ create_vpn()
   move_vm_vpn_xml_to_vms "vpn" ${DIR}/vms/vpn/$1
 }
 
-# start_vm
-# $1 - NODE_NAME: node name
-# $2 - network_no: local network no
-start_vm()
-{
-  VM_PATH="${DIR}/vms/lan$2/$1"
-  virsh create ${VM_PATH}/create_vm.xml
-
-  if [ $? -eq 0 ]; then
-    echo_ok "VM $1 create OK."
-  else
-    echo_failed "VM $1 create failed!"
-  fi
-}
-
-# start_vpn
-# $1 - NODE_NAME: node name
-start_vpn()
-{
-  VM_PATH="${DIR}/vms/vpn/$1"
-  virsh create ${VM_PATH}/create_vpn.xml
-
-  if [ $? -eq 0 ]; then
-    echo_ok "VPN $1 create OK."
-  else
-    echo_failed "VPN $1 create failed!"
-  fi
-}

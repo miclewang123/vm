@@ -3,11 +3,6 @@
 DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/function.sh
 
-##### check command ########
-check_commands bindfs debootstrap mkfs.ext4 sfdisk partprobe 
-check_commands qemu-img qemu-nbd virsh qemu-system-x86_64
-check_commands bunzip2 bzcat make wget
-
 # create_base_os
 # $1 - arch: amd64 or arm64
 # $2 - os type: debian or ubuntu
@@ -15,7 +10,6 @@ create_base_os()
 {
   execute "rm -rf ${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
 
-  DEV_NBD="/dev/nbd0"
   load_qemu_nbd
 
   BASE_ROOTFS=${DIR}/rootfs/qcow2/rootfs_${2}_${1}.${IMG_EXT}

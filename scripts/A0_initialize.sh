@@ -4,9 +4,9 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/function.sh
 
 # remove_files
-remove_files()
-{
-  return
+# remove_files()
+# {
+#   return
   # read -p "remove base image file [y/n]?" continue
   # if [[ $continue == 'y' || $continue == 'Y' ]]; then
     # execute "rm -rf ${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
@@ -34,7 +34,7 @@ remove_files()
     # do
     #   execute "virsh destroy $vm"
     # done
-}
+# }
 
 #create_folder
 create_folder()
@@ -45,6 +45,4 @@ create_folder()
   [ -d  "${DIR}/vms" ] || mkdir -p "${DIR}/vms"
   [ -d  "${DIR}/hostshare" ] || mkdir -p "${DIR}/hostshare"
   [ -L  "/var/run/hostshare" ] || ln -fs "${DIR}/hostshare" /var/run/hostshare
-
-  #chmod -R +222 *
 }

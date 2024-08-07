@@ -25,16 +25,13 @@ create_net_xml()
   file_searchandreplace %NET_UUID%     $6     $FILE_TPL_XML
 }
 
-#config_host_network
+#create_host_network
 # $1 - network no
 # $2 - ip
 # $3 - ip_mask
-config_host_network()
+create_host_network()
 {
   BR_NAME="br$1"
-
-  get_mac_address
-  MAC=$MAC_ADDR
   
   IP=$2
   IP_MASK=$3
@@ -42,7 +39,8 @@ config_host_network()
   get_uuid
   NET_UUID=$VM_UUID
 
-  create_net_xml $1 $BR_NAME $MAC $IP $IP_MASK $NET_UUID
+  get_mac_address
+  create_net_xml $1 $BR_NAME $MAC_ADDR $IP $IP_MASK $NET_UUID
  
   virsh net-create ${DIR}/vms/create_vnet$1.xml
 }
