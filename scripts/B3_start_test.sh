@@ -42,7 +42,7 @@ start_vpn()
 
 
 # create_iface_xml
-# $1 - node name 
+# $1 - tap name 
 # $2 - network no
 # $3 - slot no
 create_iface_xml()
@@ -52,22 +52,26 @@ create_iface_xml()
   cp -f ${FILE_TPL} ${FILE_TPL_XML}
 
   get_mac_address
-  file_searchandreplace %NODE_NAME%    $1         $FILE_TPL_XML
+  file_searchandreplace %TAP_NAME%     $1         $FILE_TPL_XML
   file_searchandreplace %NET_NAME%     "vnet$2"   $FILE_TPL_XML
   file_searchandreplace %NET_MAC%      $MAC_ADDR  $FILE_TPL_XML
   file_searchandreplace %SLOT%         $3         $FILE_TPL_XML
 }
 
 # get_last_tap_num
-# $1 node name
+# $1 host name
 TAP_NO=0
 get_last_tap_no()
 {
-  while $? -eq 0 
+  ip addr | grep $1_tap$TAP_NO
+  echo return ssh $?
+  while [ $? -eq 0 ]
   do
+    echo tap_no: $TAP_NO
     TAP_NO=$(expr ${TAP_NO} + 1)
-    ssh root@  ip addr | grep _tap$TAP_NO
+    ip addr | grep $1_tap$TAP_NO
   done
+  echo return tap_no: $TAP_NO
 }
 
 # get_mask_count
@@ -98,12 +102,15 @@ get_mask_count()
 add_network()
 {
   HOST_IP=$1
-  HOST=`ssh root@$1 cat /etc/hostname`
-  echo host: $HOST
+  HOST=`ssh root@$HOST_IP cat /etc/hostname`
 
-  get_last_tap_no
+  get_last_tap_no $HOST
   SLOT=$(expr $TAP_NO + 1)
-  create_iface_xml $HOST $2 $SLOT
+  if [ $SLOT -lt 10 ]; then
+    SLOT=10
+  fi
+  echo "host: $HOST slot: $SLOT tap: $TAP_NO"
+  create_iface_xml $HOST_$TAP_NO $2 $SLOT
   virsh attach-device $HOST "$DIR_TPL/iface.xml"
 
   NET_IP=$3
@@ -168,11 +175,11 @@ start_test()
   start_vm "vm2-1" 2
   start_vm "vm2-2" 2
   
-  start_vm "vm3-1" 3
-  start_vm "vm3-2" 3
+  # start_vm "vm3-1" 3
+  # start_vm "vm3-2" 3
   
   start_vpn "vpn_b1"
-  start_vpn "vpn_g1"
+  # start_vpn "vpn_g1"
 }
 
 #get_subnet

@@ -27,6 +27,4 @@ create_vm "vm4-2" $MEM_VM $CPU_VM         2 "10.4.0.11"  "255.255.255.0" "10.4.0
 
 add_network "10.2.0.1"  4 "10.4.0.10"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
 
-# get_subnet 192.168.2.20 16
-# echo $SUB_NET
 echo_ok "command end."

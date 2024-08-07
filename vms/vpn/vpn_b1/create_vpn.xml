@@ -1,12 +1,12 @@
 <domain type='kvm'>
-  <name>%NODE_NAME%</name>
-  <uuid>%VM_UUID%</uuid>
-  <memory unit='MiB'>%MEMORY%</memory>
-  <currentMemory unit='MiB'>%MEMORY%</currentMemory>
-  <vcpu placement='static'>%VCPU%</vcpu>
+  <name>vpn_b1</name>
+  <uuid>1f35c25d-6a7b-4ee1-2461-d7e511110005</uuid>
+  <memory unit='MiB'>1000</memory>
+  <currentMemory unit='MiB'>1000</currentMemory>
+  <vcpu placement='static'>4</vcpu>
   <os>
-    <type arch='%ARCH%' machine='pc'>hvm</type>
-    <kernel>%BOOT_IMAGE%</kernel>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <kernel>/home/wangyi/vm/boot_image/bzImage_amd64_virtio_9p</kernel>
     <cmdline>root=/dev/vda loglevel=1 console=hvc0 net.ifnames=0</cmdline>
     <boot dev='hd'/>
   </os>
@@ -21,10 +21,10 @@
   <on_reboot>restart</on_reboot>
   <on_crash>restart</on_crash>
   <devices>
-    <emulator>/usr/bin/%QEMU_APP%</emulator>
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='writethrough'/>
-      <source file='%ROOT_FS%'/>
+      <source file='/home/wangyi/vm/rootfs/qcow2/vpn/rootfs_vpn_vpn_b1.qcow2'/>
       <target dev='vda' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
     </disk>
@@ -39,17 +39,17 @@
     </filesystem>
     
     <interface type='network'>
-      <mac address='%NET_MAC1%'/>
-      <source network='%NET_NAME1%'/>
-      <target dev='%NODE_NAME%_tap0'/>
+      <mac address='52:54:00:71:00:05'/>
+      <source network='vnet1'/>
+      <target dev='vpn_b1_tap0'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x13' function='0x0'/>
     </interface>
 
     <interface type='network'>
-      <mac address='%NET_MAC2%'/>
-      <source network='%NET_NAME2%'/>
-      <target dev='%NODE_NAME%_tap1'/>
+      <mac address='52:54:00:71:00:06'/>
+      <source network='vnet2'/>
+      <target dev='vpn_b1_tap1'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x15' function='0x0'/>
     </interface>
@@ -62,7 +62,7 @@
     </console>
     <input type='tablet' bus='usb'/>
     <input type='mouse' bus='ps2'/>
-    <graphics type='vnc' port='%VNC%' autoport='no'/>
+    <graphics type='vnc' port='5906' autoport='no'/>
     <sound model='ich6'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
     </sound>

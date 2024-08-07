@@ -1,0 +1,7 @@
+<interface type='network'>
+      <mac address='52:54:00:71:00:04'/>
+      <source network='vnet4'/>
+      <target dev='2'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='10' function='0x0'/>
+</interface>
