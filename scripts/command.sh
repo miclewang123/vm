@@ -20,11 +20,15 @@ export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
 ##################### check run condition #####################
 echo_ok "command begin ...\n"
 
-create_host_network   4 "10.4.0.100" "255.255.255.0"
+  load_global_id_from_file
+  create_host_network   4 "10.4.0.100" "255.255.255.0"
 
-create_vm "vm4-1" $MEM_VM $CPU_VM         2 "10.4.0.10"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
-create_vm "vm4-2" $MEM_VM $CPU_VM         2 "10.4.0.11"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
+  create_vm "vm4-1" $MEM_VM $CPU_VM         4 "10.4.0.10"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
+  create_vm "vm4-2" $MEM_VM $CPU_VM         4 "10.4.0.11"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
 
-add_network "10.2.0.1"  4 "10.4.0.10"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
+  add_network "10.2.0.1"  4 "10.4.0.1"  "255.255.255.0"     # "0.0.0.0" "10.4.255.255"
+
+  start_vm "vm4-1" 4
+  start_vm "vm4-2" 4
 
 echo_ok "command end."

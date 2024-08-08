@@ -74,7 +74,8 @@ fi
 if [ $RUN_TEST = "yes" ];	then
   # B3 test
   echo_ok "test begin ..."
-  start_test 
+  start_test
+  save_global_id_to_file
   echo_ok "test end.\n"
 fi
 

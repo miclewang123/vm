@@ -58,20 +58,30 @@ create_iface_xml()
   file_searchandreplace %SLOT%         $3         $FILE_TPL_XML
 }
 
-# get_last_tap_num
+# get_last_tap_no
 # $1 host name
 TAP_NO=0
 get_last_tap_no()
 {
-  ip addr | grep $1_tap$TAP_NO
-  echo return ssh $?
+  ip addr | grep $1_tap${TAP_NO}
   while [ $? -eq 0 ]
   do
-    echo tap_no: $TAP_NO
     TAP_NO=$(expr ${TAP_NO} + 1)
-    ip addr | grep $1_tap$TAP_NO
+    ip addr | grep $1_tap${TAP_NO}
   done
-  echo return tap_no: $TAP_NO
+}
+
+# get_last_eth_no
+# $1 host ip
+ETH_NO=0
+get_last_eth_no()
+{
+  ssh root@$1 ip addr | grep "eth${ETH_NO}: "
+  while [ $? -eq 0 ]
+  do
+    ETH_NO=$(expr ${ETH_NO} + 1)
+    ssh root@$1 ip addr | grep "eth${ETH_NO}: "
+  done
 }
 
 # get_mask_count
@@ -88,17 +98,18 @@ get_mask_count()
       if [ $(($num%2)) -eq 1 ]; then
         MASK_COUNT=$(expr ${MASK_COUNT} + 1)
       fi
-      num=$(($num/2));  
+      num=$(($num/2));
     done
   done
 }
 
-# add_network
+# add network card to host ip
 # $1 - HOST_IP: host ip
-# $2 - eth network no
-# $3 - eth ip address
-# $4 - eth ip mask
-# $5 - eth gw address
+# $2 - ethX network no
+# $3 - ethX ip
+# $4 - ethX ip mask
+# $5 - ethX gateway (no use)
+# $6 - ethX broadcast (no use)
 add_network()
 {
   HOST_IP=$1
@@ -109,6 +120,9 @@ add_network()
   if [ $SLOT -lt 10 ]; then
     SLOT=10
   fi
+  SLOT=$(printf "0x%x\n" ${SLOT})
+
+  get_last_eth_no ${HOST_IP}
 
   NETWORK_NO=$2
   create_iface_xml ${HOST}_tap${TAP_NO} ${NETWORK_NO} ${SLOT}
@@ -119,11 +133,11 @@ add_network()
   get_mask_count $4
   NET_MASK_COUNT=$MASK_COUNT
 
-  NET_GATEWAY=$5
-
+  #NET_GATEWAY=$5
   get_subnet $NET_IP $NET_MASK_COUNT
 
-  execute "ssh root@${HOST_IP}  ip addr add $NET_IP/$NET_MASK_COUNT dev ${HOST}_tap${TAP_NO}; ip route add ${SUB_NET}/$NET_MASK_COUNT via $NET_GATEWAY dev ${HOST}_tap${TAP_NO}"
+  execute "ssh root@${HOST_IP} ip addr add $NET_IP/$NET_MASK_COUNT dev eth${ETH_NO};ip link set eth${ETH_NO} up"
+  #execute "ssh root@${HOST_IP} ip route add ${SUB_NET}/$NET_MASK_COUNT via $NET_GATEWAY dev eth${ETH_NO}"
 }
 
 # create_vm_vpn_config

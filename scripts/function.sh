@@ -20,12 +20,13 @@ export DIR_MNT=${DIR}/rootfs/mnt_rootfs
 export DIR_TPL=${DIR}/tpl
 
 export TERM=xterm
+export IMG_EXT="qcow2"
+export DEV_NBD="/dev/nbd0"
+
 export MAC_ID=0
 export VNC_PORT=5901
 export VM_UUID_ID=0
-export IMG_EXT="qcow2"
 export IPV6_ID=0
-export DEV_NBD="/dev/nbd0"
 
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
@@ -194,6 +195,28 @@ running_any()
 	done
 	return 1
 }
+
+#############################################
+# save_global_id_to_file
+save_global_id_to_file()
+{
+  FILE=${DIR}/etc/unique_id.sh
+  echo "#!/bin/bash"          > $FILE
+  echo "#"                    >> $FILE
+  echo "MAC_ID=${MAC_ID}"     >> $FILE
+  echo "VNC_PORT=${VNC_PORT}" >> $FILE
+  echo "VM_UUID_ID=${VM_UUID_ID}" >> $FILE
+  echo "IPV6_ID=${IPV6_ID}"   >> $FILE
+}
+
+# load_global_id_from_file
+load_global_id_from_file()
+{
+  FILE=${DIR}/etc/unique_id.sh
+  . ${FILE}
+}
+
+# init_global_id
 
 #############################################
 # search and replace strings throughout a

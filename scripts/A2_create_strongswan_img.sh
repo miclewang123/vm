@@ -52,8 +52,9 @@ create_img_from_parent()
 
   [ ! -f ${Dir}/rootfs/qcow2/rootfs_strongswan.qcow2 ] || execute "rm -rf ${Dir}/rootfs/qcow2/rootfs_strongswan.qcow2"
   
-  DIR_NEW_IMG=$(dirname `readlink -f $1`)
+  DIR_NEW_IMG=$(dirname $1)
   [ -d ${DIR_NEW_IMG} ] ||  mkdir -p ${DIR_NEW_IMG}
+
   execute "qemu-img create -b $2 -f $IMG_EXT -F $IMG_EXT $1"
   
   execute "qemu-nbd -c $DEV_NBD $1"

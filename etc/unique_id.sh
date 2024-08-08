@@ -1,0 +1,6 @@
+#!/bin/bash
+#
+MAC_ID=11
+VNC_PORT=5907
+VM_UUID_ID=9
+IPV6_ID=8

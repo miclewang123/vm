@@ -20,5 +20,6 @@ export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
 ##################### check run condition #####################
 # B5 remove vm vpn config and images
 echo_ok "remove images and config begin ..."
+stop_test
 remove_config_img
 echo_ok "remove images and config end.\n"
