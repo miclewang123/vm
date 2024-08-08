@@ -136,6 +136,7 @@ create_interfaces()
 # $8 - eth0 broadcast address
 create_vm()
 {
+  echo_ok "create vm $1 xml file."
   PARENT_IMG="${DIR_ROOTFS}/rootfs_debian_amd64.${IMG_EXT}" 
   [ -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
 
@@ -193,6 +194,7 @@ create_vm()
 # $13- eth1 broadcast address
 create_vpn()
 {
+  echo_ok "create vpn $1 xml file"
   PARENT_IMG="${DIR_ROOTFS}/rootfs_strongswan.${IMG_EXT}" 
   [ -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
 
@@ -241,6 +243,7 @@ create_vpn()
 # $2 - network_no: local network no
 start_vm()
 {
+  echo_ok "start vm: $1"
   VM_PATH="${DIR_VMS}/lan$2/$1"
   virsh create ${VM_PATH}/create_vm.xml
 
@@ -255,6 +258,7 @@ start_vm()
 # $1 - NODE_NAME: node name
 start_vpn()
 {
+  echo_ok "start vpn: $1"
   VM_PATH="${DIR_VMS}/vpn/$1"
   virsh create ${VM_PATH}/create_vpn.xml
 

@@ -32,7 +32,7 @@ stop_test
 # A0 initialize
 if [ $INITIALIZE = "yes" ];	then
   echo_ok "initialize begin ..."
-  create_folder
+  initialize
   echo_ok "initialize end.\n"
 fi
 

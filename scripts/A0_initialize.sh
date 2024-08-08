@@ -36,7 +36,7 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
     # done
 # }
 
-#create_folder
+# create_folder
 create_folder()
 {
   [ -d  "${DIR_LOOP}" ] || mkdir -p "${DIR_LOOP}"
@@ -44,4 +44,10 @@ create_folder()
   [ -d  "${DIR_VMS}" ]  || mkdir -p "${DIR_VMS}"
   [ -d  "${DIR_HOST_SHARE}" ]   || mkdir -p "${DIR_HOST_SHARE}"
   [ -L  "/var/host_share" ] || ln -fs "${DIR_HOST_SHARE}" /var/host_share
+}
+
+# initialize
+initialize()
+{
+  create_folder
 }
