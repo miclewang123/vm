@@ -21,12 +21,12 @@ create_vm_vpn_config()
   # $6 - eth0 ip mask
   # $7 - eth0 gw address
   # $8 - eth0 broadcast address
+  echo_ok "create vm"
   create_vm "vm2-1" $MEM_VM $CPU_VM         2 "10.2.0.10"  "255.255.255.0" "10.2.0.1" "10.2.255.255"
   create_vm "vm2-2" $MEM_VM $CPU_VM         2 "10.2.0.11"  "255.255.255.0" "10.2.0.1" "10.2.255.255"
 
   create_vm "vm3-1" $MEM_VM $CPU_VM         3 "10.3.0.10"  "255.255.255.0" "10.3.0.1" "10.3.255.255"
   create_vm "vm3-2" $MEM_VM $CPU_VM         3 "10.3.0.11"  "255.255.255.0" "10.3.0.1" "10.3.255.255"
-
 
   # $1 - NODE_NAME: node name
   # $2 - MEMORY(MB): memory
@@ -41,12 +41,14 @@ create_vm_vpn_config()
   # $11- eth1 ip mask
   # $12- eth1 gw address
   # $13- eth1 broadcast address
+  echo_ok "create vpn"
   create_vpn "vpn_b1" $MEM_VPN $CPU_VPN     1 "192.168.0.10"  "255.255.255.0" "192.168.0.1" "192.168.255.255"        2 "10.2.0.1"  "255.255.255.0" "0.0.0.0" "10.2.255.255"
   create_vpn "vpn_g1" $MEM_VPN $CPU_VPN     1 "192.168.0.11"  "255.255.255.0" "192.168.0.1" "192.168.255.255"        3 "10.3.0.1"  "255.255.255.0" "0.0.0.0" "10.3.255.255"
-
+  
   # $1 - network no
   # $2 - ip
   # $3 - ip_mask
+  echo_ok "creat host network"
   create_host_network 1 "192.168.0.100" "255.255.255.0"
   create_host_network 2 "10.2.0.100" "255.255.255.0"
   create_host_network 3 "10.3.0.100" "255.255.255.0"

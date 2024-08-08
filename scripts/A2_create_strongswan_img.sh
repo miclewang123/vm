@@ -50,8 +50,8 @@ create_img_from_parent()
 
   load_qemu_nbd
 
-  [ ! -f ${DIR_ROOTFS}/rootfs_strongswan.qcow2 ] || execute "rm -rf ${DIR_ROOTFS}/rootfs_strongswan.qcow2"
-  
+  [ -f $1 ] || execute "rm -f $1"
+
   DIR_NEW_IMG=$(dirname $1)
   [ -d ${DIR_NEW_IMG} ] ||  mkdir -p ${DIR_NEW_IMG}
 
@@ -96,6 +96,8 @@ create_strongswan_img()
 
   execute "umount $DIR_MNT/proc"
   execute "umount $DIR_MNT"
+  
+  execute "chmod 777 ${STRONGSWAN_IMG}"
   
   execute "qemu-nbd -d $DEV_NBD"
 }

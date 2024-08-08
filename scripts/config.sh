@@ -4,7 +4,7 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/function.sh
 
 ############ define step ######################################
-if [ 1 -eq 1 ]; then
+if [ 0 -eq 1 ]; then
   export INITIALIZE="no"
 
   export BUILD_BASE="no"

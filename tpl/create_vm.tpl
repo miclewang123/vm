@@ -33,8 +33,8 @@
     </controller>
 
     <filesystem type='mount' accessmode='mapped'>
-      <source dir='/var/run/host_share'/>
-      <target dir='/dev/host_share'/>
+      <source dir='/var/host_share'/>
+      <target dir='/host_share'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
     </filesystem>
     

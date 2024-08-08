@@ -62,6 +62,7 @@ create_iface_xml()
   cp -f ${FILE_TPL} ${FILE_TPL_XML}
 
   get_mac_address
+
   file_searchandreplace %TAP_NAME%     $1         $FILE_TPL_XML
   file_searchandreplace %NET_NAME%     "vnet$2"   $FILE_TPL_XML
   file_searchandreplace %NET_MAC%      $MAC_ADDR  $FILE_TPL_XML
@@ -155,6 +156,12 @@ get_subnet()
 add_network_to_host()
 {
   HOST_IP=$1
+  NETWORK_NO=$2
+  NET_IP=$3
+  NET_IP_MASK=$4
+  #NET_GATEWAY=$5
+  #NET_BROADCAST =$6
+
   HOST=`ssh root@$HOST_IP cat /etc/hostname`
 
   get_last_tap_no $HOST
@@ -166,20 +173,19 @@ add_network_to_host()
 
   get_last_eth_no ${HOST_IP}
 
-  NETWORK_NO=$2
   create_iface_xml ${HOST}_tap${TAP_NO} ${NETWORK_NO} ${SLOT}
-  virsh attach-device $HOST "$DIR_TPL/iface.xml"
-
-  NET_IP=$3
   
-  get_mask_count $4
+  FILE_TPL_XML="$DIR_TPL/iface.xml"
+  virsh attach-device $HOST ${FILE_TPL_XML}
+  execute "rm -f ${FILE_TPL_XML}"
+
+  get_mask_count ${NET_IP_MASK}
   NET_MASK_COUNT=$MASK_COUNT
 
-  #NET_GATEWAY=$5
   get_subnet $NET_IP $NET_MASK_COUNT
 
   execute "ssh root@${HOST_IP} ip addr add $NET_IP/$NET_MASK_COUNT dev eth${ETH_NO};ip link set eth${ETH_NO} up"
   #execute "ssh root@${HOST_IP} ip route add ${SUB_NET}/$NET_MASK_COUNT via $NET_GATEWAY dev eth${ETH_NO}"
 }
 
-##########################################################################
+###########################################################

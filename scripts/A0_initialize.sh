@@ -43,5 +43,5 @@ create_folder()
   [ -d  "${DIR_LOG}" ]  || mkdir -p "${DIR_LOG}"
   [ -d  "${DIR_VMS}" ]  || mkdir -p "${DIR_VMS}"
   [ -d  "${DIR_HOST_SHARE}" ]   || mkdir -p "${DIR_HOST_SHARE}"
-  [ -L  "/var/run/host_share" ] || ln -fs "${DIR_HOST_SHARE}" /var/run/host_share
+  [ -L  "/var/host_share" ] || ln -fs "${DIR_HOST_SHARE}" /var/host_share
 }

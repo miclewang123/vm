@@ -50,7 +50,7 @@ move_vm_vpn_xml_to_vms()
   mkdir -p $2
   rm -f $1/create_$1.xml
   mv ${DIR_TPL}/create_$1.xml $2/
-  execute "chmod 777 $2/create_$1.xml"
+  # execute "chmod 777 $2/create_$1.xml"
 }
 
 # create_vm_vpn_xml
@@ -139,7 +139,7 @@ create_vm()
   PARENT_IMG="${DIR_ROOTFS}/rootfs_debian_amd64.${IMG_EXT}" 
   [ -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
 
-  VM_IMG="${DIR_VMS}/lan$4/rootfs_vm_$1.${IMG_EXT}"
+  VM_IMG="${DIR_VMS}/lan$4/$1/rootfs_vm_$1.${IMG_EXT}"
   create_img_from_parent ${VM_IMG} ${PARENT_IMG}
 
   # install
@@ -196,7 +196,7 @@ create_vpn()
   PARENT_IMG="${DIR_ROOTFS}/rootfs_strongswan.${IMG_EXT}" 
   [ -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
 
-  VM_IMG="${DIR_VMS}/vpn/rootfs_vpn_$1.${IMG_EXT}"
+  VM_IMG="${DIR_VMS}/vpn/$1/rootfs_vpn_$1.${IMG_EXT}"
   create_img_from_parent ${VM_IMG} ${PARENT_IMG}
 
   # install
@@ -245,9 +245,9 @@ start_vm()
   virsh create ${VM_PATH}/create_vm.xml
 
   if [ $? -eq 0 ]; then
-    echo_ok "VM $1 create OK."
+    echo_ok "VM $1 start OK."
   else
-    echo_failed "VM $1 create failed!"
+    echo_failed "VM $1 start failed!"
   fi
 }
 
@@ -259,8 +259,8 @@ start_vpn()
   virsh create ${VM_PATH}/create_vpn.xml
 
   if [ $? -eq 0 ]; then
-    echo_ok "VPN $1 create OK."
+    echo_ok "VPN $1 start OK."
   else
-    echo_failed "VPN $1 create failed!"
+    echo_failed "VPN $1 start failed!"
   fi
 }

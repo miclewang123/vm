@@ -223,8 +223,6 @@ load_global_id_from_file()
   . ${FILE}
 }
 
-# init_global_id
-
 #############################################
 # search and replace strings throughout a
 # whole directory

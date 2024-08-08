@@ -17,7 +17,7 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 export TEST_DATE="$(date +%Y%m%d)"
 export LOG_FILE=${DIR_LOG}/log${TEST_DATE}.txt
 
-##################### check run condition #####################
+##################### run command ############################
 echo_ok "command begin ...\n"
 
   load_global_id_from_file
@@ -37,3 +37,4 @@ echo_ok "command begin ...\n"
   start_vm "vm4-2" 4
 
 echo_ok "command end."
+###############################################################
