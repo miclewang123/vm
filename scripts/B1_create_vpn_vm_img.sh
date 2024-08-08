@@ -136,10 +136,10 @@ create_interfaces()
 # $8 - eth0 broadcast address
 create_vm()
 {
-  PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}" 
+  PARENT_IMG="${DIR_ROOTFS}/rootfs_debian_amd64.${IMG_EXT}" 
   [ -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
 
-  VM_IMG="${DIR}/rootfs/qcow2/lan$4/rootfs_vm_$1.${IMG_EXT}"
+  VM_IMG="${DIR_VMS}/lan$4/rootfs_vm_$1.${IMG_EXT}"
   create_img_from_parent ${VM_IMG} ${PARENT_IMG}
 
   # install
@@ -160,8 +160,8 @@ create_vm()
   execute "qemu-nbd -d $DEV_NBD"
 
   #
-  IMAGE="${DIR}/boot_image/bzImage_amd64_virtio_9p"
-  #IMAGE="${DIR}/boot_image/bzImage6-3"
+  IMAGE="${DIR_BOOT}/bzImage_amd64_virtio_9p"
+  #IMAGE="${DIR_BOOT}/bzImage6-3"
   IMAGE=${IMAGE//\//\\\/}
 
   ROOT_FS=${VM_IMG//\//\\\/}
@@ -174,7 +174,7 @@ create_vm()
   get_uuid
 
   create_vm_vpn_xml "vm" $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' ${VNC_PORT} ${VM_UUID} ${NET_MAC1} ${NET_NAME1}
-  move_vm_vpn_xml_to_vms "vm" ${DIR}/vms/lan$4/$1
+  move_vm_vpn_xml_to_vms "vm" ${DIR_VMS}/lan$4/$1
 }
 
 # create_vpn
@@ -193,10 +193,10 @@ create_vm()
 # $13- eth1 broadcast address
 create_vpn()
 {
-  PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}" 
+  PARENT_IMG="${DIR_ROOTFS}/rootfs_strongswan.${IMG_EXT}" 
   [ -f "${PARENT_IMG}" ] || die "${PARENT_IMG} is not exist!"
 
-  VM_IMG="${DIR}/rootfs/qcow2/vpn/rootfs_vpn_$1.${IMG_EXT}"
+  VM_IMG="${DIR_VMS}/vpn/rootfs_vpn_$1.${IMG_EXT}"
   create_img_from_parent ${VM_IMG} ${PARENT_IMG}
 
   # install
@@ -216,8 +216,8 @@ create_vpn()
   execute "qemu-nbd -d $DEV_NBD"
 
   #
-  IMAGE="${DIR}/boot_image/bzImage_amd64_virtio_9p"
-  #IMAGE="${DIR}/boot_image/bzImage6-3"
+  IMAGE="${DIR_BOOT}/bzImage_amd64_virtio_9p"
+  #IMAGE="${DIR_BOOT}/bzImage6-3"
   IMAGE=${IMAGE//\//\\\/}
 
   ROOT_FS=${VM_IMG//\//\\\/}
@@ -233,6 +233,34 @@ create_vpn()
   get_uuid
 
   create_vm_vpn_xml "vpn" $1 'x86_64' $2 $3 ${ROOT_FS} ${IMAGE} 'qemu-system-x86_64' $VNC_PORT ${VM_UUID} $NET_MAC1 $NET_NAME1 $NET_MAC2 $NET_NAME2
-  move_vm_vpn_xml_to_vms "vpn" ${DIR}/vms/vpn/$1
+  move_vm_vpn_xml_to_vms "vpn" ${DIR_VMS}/vpn/$1
 }
 
+# start_vm
+# $1 - NODE_NAME: node name
+# $2 - network_no: local network no
+start_vm()
+{
+  VM_PATH="${DIR_VMS}/lan$2/$1"
+  virsh create ${VM_PATH}/create_vm.xml
+
+  if [ $? -eq 0 ]; then
+    echo_ok "VM $1 create OK."
+  else
+    echo_failed "VM $1 create failed!"
+  fi
+}
+
+# start_vpn
+# $1 - NODE_NAME: node name
+start_vpn()
+{
+  VM_PATH="${DIR_VMS}/vpn/$1"
+  virsh create ${VM_PATH}/create_vpn.xml
+
+  if [ $? -eq 0 ]; then
+    echo_ok "VPN $1 create OK."
+  else
+    echo_failed "VPN $1 create failed!"
+  fi
+}

@@ -9,25 +9,25 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 #   return
   # read -p "remove base image file [y/n]?" continue
   # if [[ $continue == 'y' || $continue == 'Y' ]]; then
-    # execute "rm -rf ${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
+    # execute "rm -rf ${DIR_ROOTFS}/rootfs_debian_amd64.${IMG_EXT}"
   # fi
 
   # read -p "remove strongswan image file [y/n]?" continue
   # if [[ $continue == 'y' || $continue == 'Y' ]]; then
-    # execute "rm -rf ${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}"
+    # execute "rm -rf ${DIR_ROOTFS}/rootfs_strongswan.${IMG_EXT}"
   # fi
 
   # read -p "remove vm files [y/n]?" continue
   # if [[ $continue == 'y' || $continue == 'Y' ]]; then
-    # execute "rm -rf ${DIR}/rootfs/qcow2/lan*/*.${IMG_EXT}"
+    # execute "rm -rf ${DIR_ROOTFS}/lan*/*.${IMG_EXT}"
   # fi
 
   # read -p "remove vpn files [y/n]?" continue
   # if [[ $continue == 'y' || $continue == 'Y' ]]; then
-    # execute "rm -rf ${DIR}/rootfs/qcow2/vpn/*.${IMG_EXT}"
+    # execute "rm -rf ${DIR_ROOTFS}/vpn/*.${IMG_EXT}"
   # fi
 
-    # execute "rm -rf ${DIR}/vms/*"
+    # execute "rm -rf ${DIR_VMS}/*"
 
     # vms=`virsh list --name`
     # for vm in $vms
@@ -39,10 +39,9 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 #create_folder
 create_folder()
 {
-  [ -d  "${DIR}/rootfs/qcow2" ] || mkdir -p "${DIR}/rootfs/qcow2"
-  [ -d  "${DIR}/loop" ] || mkdir -p "${DIR}/loop"
-  [ -d  "${DIR}/log" ] || mkdir -p "${DIR}/log"
-  [ -d  "${DIR}/vms" ] || mkdir -p "${DIR}/vms"
-  [ -d  "${DIR}/hostshare" ] || mkdir -p "${DIR}/hostshare"
-  [ -L  "/var/run/hostshare" ] || ln -fs "${DIR}/hostshare" /var/run/hostshare
+  [ -d  "${DIR_LOOP}" ] || mkdir -p "${DIR_LOOP}"
+  [ -d  "${DIR_LOG}" ]  || mkdir -p "${DIR_LOG}"
+  [ -d  "${DIR_VMS}" ]  || mkdir -p "${DIR_VMS}"
+  [ -d  "${DIR_HOST_SHARE}" ]   || mkdir -p "${DIR_HOST_SHARE}"
+  [ -L  "/var/run/host_share" ] || ln -fs "${DIR_HOST_SHARE}" /var/run/host_share
 }

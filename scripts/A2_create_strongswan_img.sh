@@ -50,7 +50,7 @@ create_img_from_parent()
 
   load_qemu_nbd
 
-  [ ! -f ${Dir}/rootfs/qcow2/rootfs_strongswan.qcow2 ] || execute "rm -rf ${Dir}/rootfs/qcow2/rootfs_strongswan.qcow2"
+  [ ! -f ${DIR_ROOTFS}/rootfs_strongswan.qcow2 ] || execute "rm -rf ${DIR_ROOTFS}/rootfs_strongswan.qcow2"
   
   DIR_NEW_IMG=$(dirname $1)
   [ -d ${DIR_NEW_IMG} ] ||  mkdir -p ${DIR_NEW_IMG}
@@ -66,7 +66,7 @@ create_img_from_parent()
 
   execute "cp /etc/resolv.conf $DIR_MNT/etc/resolv.conf"
 
-  execute "cp $DIR/etc/fstab $DIR_MNT/etc/"
+  execute "cp ${DIR_ETC}/fstab $DIR_MNT/etc/"
   #execute "echo /dev/vda  /  ext4  defaults,relatime,barrier=1 0 1 > $DIR_MNT/etc/fstab"
 
   execute "umount $DIR_MNT/proc"
@@ -78,8 +78,8 @@ create_img_from_parent()
 #create_strongswan_img
 create_strongswan_img()
 {
-  STRONGSWAN_IMG="${DIR}/rootfs/qcow2/rootfs_strongswan.${IMG_EXT}"
-  PARENT_IMG="${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
+  STRONGSWAN_IMG="${DIR_ROOTFS}/rootfs_strongswan.${IMG_EXT}"
+  PARENT_IMG="${DIR_ROOTFS}/rootfs_debian_amd64.${IMG_EXT}"
 
   execute "rm -rf ${STRONGSWAN_IMG}"
   create_img_from_parent ${STRONGSWAN_IMG} ${PARENT_IMG}

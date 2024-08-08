@@ -1,4 +1,5 @@
-boot_image/
+boot/
 log/
 rootfs/
-
+vms/
+host_share/

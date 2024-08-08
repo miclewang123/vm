@@ -14,10 +14,9 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/B5_remove_vm_vpn_config_img.sh
 
 ###############################################################
-export TEST_DATE="$(date +%Y%m%d)"
-export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
-
 ##################### check run condition #####################
 echo_ok "stop begin ...\n"
 stop_test
 echo_ok "stop end."
+
+###############################################################

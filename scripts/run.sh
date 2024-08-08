@@ -16,11 +16,8 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 . $DIR_SCRIPTS/config.sh
 
 ###############################################################
-#export TEST_DATE="$(date +%Y%m%d%H%M%S)"
-export TEST_DATE="$(date +%Y%m%d)"
-export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
-
 echo_ok "run begin ...\n"
+
 ##################### check run condition #####################
 # run condition check
 [ `id -u` -eq 0 ] || die "You must be root to run $0"
@@ -75,7 +72,6 @@ if [ $RUN_TEST = "yes" ];	then
   # B3 test
   echo_ok "test begin ..."
   start_test
-  save_global_id_to_file
   echo_ok "test end.\n"
 fi
 

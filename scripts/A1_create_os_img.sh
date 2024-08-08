@@ -8,11 +8,11 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 # $2 - os type: debian or ubuntu
 create_base_os()
 {
-  execute "rm -rf ${DIR}/rootfs/qcow2/rootfs_debian_amd64.${IMG_EXT}"
+  execute "rm -rf ${DIR_ROOTFS}/rootfs_debian_amd64.${IMG_EXT}"
 
   load_qemu_nbd
 
-  BASE_ROOTFS=${DIR}/rootfs/qcow2/rootfs_${2}_${1}.${IMG_EXT}
+  BASE_ROOTFS=${DIR_ROOTFS}/rootfs_${2}_${1}.${IMG_EXT}
   [ ! -f ${BASE_ROOTFS} ] ||  die "${BASE_ROOTFS} file is existed, please remove it first!"
   
   echo_ok "`date`, building $BASE_ROOTFS" >> $LOG_FILE
@@ -23,8 +23,8 @@ create_base_os()
 
   execute "mkdir -p ${DIR_MNT}"
   execute "mount ${DEV_NBD} ${DIR_MNT}"
-  execute "cp -af ${DIR}/rootfs/rootfs_${2}_${1}/* ${DIR_MNT}"
-  execute "cp -af ${DIR}/etc/ssh/sshd_config ${DIR_MNT}/etc/ssh/"
+  execute "cp -af ${DIR_ROOTFS}/rootfs_${2}_${1}/* ${DIR_MNT}"
+  execute "cp -af ${DIR_ETC}/ssh/sshd_config ${DIR_MNT}/etc/ssh/"
 
 #   # package includes/excludes
 #   INC=automake autoconf libtool bison flex gperf pkg-config gettext less locales

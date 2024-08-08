@@ -18,6 +18,12 @@ DIR_SCRIPTS="$(dirname `readlink -f $0`)"
 export DIR="$(dirname ${DIR_SCRIPTS})"
 export DIR_MNT=${DIR}/rootfs/mnt_rootfs
 export DIR_TPL=${DIR}/tpl
+export DIR_VMS=${DIR}/vms
+export DIR_ROOTFS=${DIR}/rootfs
+export DIR_ETC=${DIR}/etc
+export DIR_BOOT=${DIR}/boot
+export DIR_LOG=${DIR}/log
+export DIR_HOST_SHARE=${DIR}/host_share
 
 export TERM=xterm
 export IMG_EXT="qcow2"
@@ -35,8 +41,9 @@ NORMAL=$(tput op)
 
 if [ -z "$LOG_FILE" ]; then
   #TEST_DATE="$(date +%Y%m%d%H%M%S)"
+  #TEST_DATE="$(date +%Y%m%d)"
   TEST_DATE=""
-  export LOG_FILE=${DIR}/log/test${TEST_DATE}.log
+  export LOG_FILE=${DIR_LOG}/log${TEST_DATE}.log
 fi
 
 # exit with given error message
@@ -200,7 +207,7 @@ running_any()
 # save_global_id_to_file
 save_global_id_to_file()
 {
-  FILE=${DIR}/etc/unique_id.sh
+  FILE=${DIR_ETC}/unique_id.sh
   echo "#!/bin/bash"          > $FILE
   echo "#"                    >> $FILE
   echo "MAC_ID=${MAC_ID}"     >> $FILE
@@ -212,7 +219,7 @@ save_global_id_to_file()
 # load_global_id_from_file
 load_global_id_from_file()
 {
-  FILE=${DIR}/etc/unique_id.sh
+  FILE=${DIR_ETC}/unique_id.sh
   . ${FILE}
 }
 

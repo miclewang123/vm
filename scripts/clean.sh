@@ -15,7 +15,7 @@ DIR_SCRIPTS=$(dirname `readlink -f $0`)
 
 ###############################################################
 export TEST_DATE="$(date +%Y%m%d)"
-export LOG_FILE=${DIR}/log/log${TEST_DATE}.txt
+export LOG_FILE=${DIR_LOG}/log${TEST_DATE}.txt
 
 ##################### check run condition #####################
 # B5 remove vm vpn config and images
