@@ -76,7 +76,10 @@ B is test；
 
 ========================= user call =========================================
 
-run.sh  -  run test in steps
-stop.sh -  stop test vm and vpn, remove net config
+run.sh     -  run test in steps
+stop.sh	   -  stop test vm and vpn, remove net config
+clean.sh   -  clean the xml and qcow2 image files
+config.sh  -  define which step will be execute in run.sh
+command.sh -  define the code of your self
 
 =============================================================================

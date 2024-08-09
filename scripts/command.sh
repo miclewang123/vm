@@ -22,44 +22,21 @@ echo_ok "command begin ...\n"
 
   load_global_id_from_file
 
-  # create
+  #
   create_host_network 4 "10.4.0.100" "255.255.255.0"
-
-  # start
   start_host_network 4
 
-  #
+  # 
   add_network_to_host "10.2.0.1"  4 "10.4.0.1"  "255.255.255.0"     # "0.0.0.0" "10.4.255.255"
 
   #
   create_vm "vm4-1" $MEM_VM $CPU_VM         4 "10.4.0.10"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
-  create_vm "vm4-2" $MEM_VM $CPU_VM         4 "10.4.0.11"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
-
   start_vm "vm4-1" 4
+
+  create_vm "vm4-2" $MEM_VM $CPU_VM         4 "10.4.0.11"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
   start_vm "vm4-2" 4
 
+  save_global_id_to_file
 echo_ok "command end."
+
 ###############################################################
-
-# add net vm
-add_net_vm()
-{
-  load_global_id_from_file
-
-  # create
-  create_host_network 4 "10.4.0.100" "255.255.255.0"
-  
-  # start
-  start_host_network 4
-
-  add_network_to_host "10.2.0.1"  4 "10.4.0.1"  "255.255.255.0"     # "0.0.0.0" "10.4.255.255"
-
-}
-  
-add_vm()
-{
-  load_global_id_from_file
-
-  create_vm "vm4-1" $MEM_VM $CPU_VM         4 "10.4.0.10"  "255.255.255.0" "10.4.0.1" "10.4.255.255"
-  start_vm "vm4-1" 4  
-}
